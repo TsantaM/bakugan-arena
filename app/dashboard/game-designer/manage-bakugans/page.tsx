@@ -1,6 +1,6 @@
 'use server'
 
-import AddBakugan from "@/components/elements/game-designer/manage-bakugans/add-bakugans"
+import AddBakugan from "@/components/elements/game-designer/manage-bakugans/add-bakugans/add-bakugans"
 import { Card, CardHeader } from "@/components/ui/card"
 import Section from "@/components/ui/section"
 import { getUser, getUserRole } from "@/src/actions/getUserSession"
