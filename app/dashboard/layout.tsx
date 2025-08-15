@@ -20,7 +20,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
         <SidebarProvider>
             <AppSidebar role={role}/>
             <SidebarInset>
-                <main className="w-full p-3">
+                <main className="w-full p-3 flex flex-col gap-3">
                     <div className="w-full flex items-center justify-between">
                         <SidebarTrigger />
                         <div className="flex items-center gap-3">

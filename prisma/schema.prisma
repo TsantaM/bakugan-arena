@@ -36,8 +36,8 @@ model User {
   displayUsername String?
 
   @@unique([email])
-  @@map("user")
   @@unique([username])
+  @@map("user")
 }
 
 model Session {
@@ -83,4 +83,28 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+// Bakugans
+
+enum Attribut {
+  Pyrus
+  Ventus
+  Aquos
+  Subterra
+  Haos
+  Darkus
+}
+
+model Bakugan {
+  id                String   @id @default(uuid())
+  nom               String
+  attribut          Attribut
+  niveauDePuissance Int      @default(250)
+  image             String
+
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  @@unique([nom, attribut])
 }
