@@ -18,7 +18,7 @@ export default function GamedesignerPage() {
                 <CardContent>
                     <ul className="flex flex-col lg:items-center lg:flex-row gap-3">
                         <li><Button variant='outline' asChild><Link href='/dashboard/game-designer/manage-bakugans'>Manage Bakugans</Link></Button></li>
-                        <li><Button variant='outline' asChild><Link href='/dashboard/game-designer/manage-bakugans'>Manage Ability Cards</Link></Button></li>
+                        <li><Button variant='outline' asChild><Link href='/dashboard/game-designer/manage-ability-cards'>Manage Ability Cards</Link></Button></li>
                         <li><Button variant='outline' asChild><Link href='/dashboard/game-designer/manage-bakugans'>Manage Exclusives Ability Cards</Link></Button></li>
                         <li><Button variant='outline' asChild><Link href='/dashboard/game-designer/manage-bakugans'>Manage Gate Cards</Link></Button></li>
                     </ul>

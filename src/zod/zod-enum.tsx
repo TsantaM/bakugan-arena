@@ -21,3 +21,13 @@ export const niveauDePuissanceSchema = z.enum([
     '425',
     '450'
 ] as const);
+
+
+export const abilityCardsBonusAndManus = z.enum([
+    '0',
+    '50',
+    '75',
+    '100',
+    '150',
+    '200'
+])

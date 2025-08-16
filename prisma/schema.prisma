@@ -103,8 +103,38 @@ model Bakugan {
   niveauDePuissance Int      @default(250)
   image             String
 
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([nom, attribut])
+}
+
+model AbilityCard {
+  id          String @id @default(uuid())
+  nom         String @unique
+  description String
+  maxPerDeck  Int    @default(3)
+
+  // Relations
+  attributs Attribut // liaison N-N avec attributs si besoin
+
+  // Statistiques de puissance
+  bonus Int @default(0) // G-Power ajouté
+  malus Int @default(0) // G-Power retiré à l'adversaire
+
+  // Effets spéciaux (booléens pour logique de jeu)
+  stopGate             Boolean @default(false) // Annule tous les effets de la gate
+  blockGate            Boolean @default(false) // Bloque l'ouverture de la gate adverses
+  swipeGate            Boolean @default(false) // Echange la gate avec une autre
+  moveSelf             Boolean @default(false) // Permet de déplacer son propre Bakugan
+  moveOpponent         Boolean @default(false) // Permet de déplacer le Bakugan adverse
+  moveAnOther          Boolean @default(false) // Permet de déplacer un autre bakugan qui est présent sur le champs de batail (alié ou enemie)
+  attractOpponent      Boolean @default(false) // Permet d'attirer un Bakugan sur la carte portail où l'utilisateur se trouve
+  cancelAbilities      Boolean @default(false) // Permet d'annuler les maitrises de l'adversaire
+  protectFromGate      Boolean @default(false) // Protege contre la carte portail de l'adversaire
+  protectFromAbilities Boolean @default(false) // Protège contre les maitrises de l'adversaire
+  drainAbilityPower    Boolean @default(false) // Absorbe tous les points ajouté à l'adversaire
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
