@@ -26,7 +26,7 @@ export default async function ManageBakugansPage() {
                     <CardHeader>
                         <div className="flex items-center justify-end gap-2">
                             <RefetchBakugans/>
-                            <Button variant='outline' asChild><Link href='/dashboard/game-designer/manage-abiliy-cards/create-ability-card'><Plus /> Add new Bakugan</Link></Button>
+                            <Button variant='outline' asChild><Link href='/dashboard/game-designer/manage-bakugans/create-bakugan'><Plus /> Add new Bakugan</Link></Button>
                         </div>
                     </CardHeader>
                     <BakuganList/>

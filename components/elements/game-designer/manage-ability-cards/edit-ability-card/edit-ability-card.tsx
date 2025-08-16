@@ -1,49 +1,52 @@
 'use client'
 
-import z from "zod"
-import { createAbilityCardSchema } from "./create-ability-cards-zod"
-import { useForm } from "react-hook-form";
+import { GetAbilityForEditorType } from "@/src/actions/game-designer/manage-ability-cards/get-card-for-editor"
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AttributTable } from "@/src/variables/attribut";
 import { BonusAndMalus } from "@/src/variables/bonus-and-malus";
 import { Switch } from "@/components/ui/switch";
 import { AbilityCardsEffects } from "@/src/variables/ability-cards-effects";
 import { Button } from "@/components/ui/button";
+import { EditAbilityCardSchema } from "./edit-ability-card-zod";
+import z from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CreateAbilityCardAction } from "@/src/actions/game-designer/manage-ability-cards/create-ability-cards";
+import { EditAbilityCardsAction } from "@/src/actions/game-designer/manage-ability-cards/edit-ability-cards-action";
 import { Toaster } from "@/components/ui/sonner";
+import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from "next/navigation";
 
+export type editAbilityCard_type = z.infer<typeof EditAbilityCardSchema>
 
-export type createAbilityCard_type = z.infer<typeof createAbilityCardSchema>
-export default function CreateAbilityCards() {
-
-    const createAbilityCardForm = useForm<createAbilityCard_type>({
-        resolver: zodResolver(createAbilityCardSchema), defaultValues: {
-            nom: '',
-            description: '',
-            attribut: "Pyrus",
+export default function EditAbilityCard({ id, data }: { id: string, data: GetAbilityForEditorType | undefined }) {
+    const router = useRouter()
+    const EditAbiliyCardForm = useForm<editAbilityCard_type>({
+        resolver: zodResolver(EditAbilityCardSchema), defaultValues: {
+            nom: data?.nom,
+            description: data?.description,
+            attribut: data?.attributs,
 
             maxPerDeck: 1,
-            bonus: '0',
-            malus: '0',
+            bonus: data?.bonus as "0" | "50" | "75" | "100" | "150" | "200" | undefined,
+            malus: data?.malus as "0" | "50" | "75" | "100" | "150" | "200" | undefined,
 
-            stopGate: false,
-            blockGate: false,
-            swipeGate: false,
-            moveSelf: false,
-            moveOpponent: false,
-            moveAnOther: false,
-            attractOpponent: false,
-            cancelAbilities: false,
-            protectFromGate: false,
-            protectFromAbilities: false,
-            drainAbilityPower: false
+            stopGate: data?.stopGate,
+            blockGate: data?.blockGate,
+            swipeGate: data?.swipeGate,
+            moveSelf: data?.moveSelf,
+            moveOpponent: data?.moveOpponent,
+            moveAnOther: data?.moveAnOther,
+            attractOpponent: data?.attractOpponent,
+            cancelAbilities: data?.cancelAbilities,
+            protectFromGate: data?.protectFromGate,
+            protectFromAbilities: data?.protectFromAbilities,
+            drainAbilityPower: data?.drainAbilityPower
+
         }
     });
 
@@ -56,11 +59,12 @@ export default function CreateAbilityCards() {
     }
 
     const mutation = useMutation({
-        mutationFn: (formData: createAbilityCard_type) => CreateAbilityCardAction(formData),
+        mutationFn: (formData: editAbilityCard_type) => EditAbilityCardsAction({ id, formData }),
         onSuccess: () => {
             toast.success('Ability Card created successfully')
-            createAbilityCardForm.reset();
+            EditAbiliyCardForm.reset();
             handleRefetch()
+            router.push('/dashboard/game-designer/manage-ability-cards')
         },
         onError: (error) => {
             console.error("Erreur lors de la création :", error);
@@ -68,12 +72,13 @@ export default function CreateAbilityCards() {
         }
     })
 
-    const onSubmit = (formData: createAbilityCard_type) => {
+    const onSubmit = (formData: editAbilityCard_type) => {
         mutation.mutate(formData)
     }
 
     return (
         <>
+
             <Card>
                 <CardHeader>
                     <CardTitle>Create new Ability Card</CardTitle>
@@ -81,8 +86,8 @@ export default function CreateAbilityCards() {
                 </CardHeader>
 
                 <CardContent>
-                    <Form {...createAbilityCardForm}>
-                        <form onSubmit={createAbilityCardForm.handleSubmit(onSubmit)} className="flex flex-col space-y-5">
+                    <Form {...EditAbiliyCardForm}>
+                        <form onSubmit={EditAbiliyCardForm.handleSubmit(onSubmit)} className="flex flex-col space-y-5">
 
                             <Card>
                                 <CardHeader>
@@ -90,7 +95,7 @@ export default function CreateAbilityCards() {
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-3">
                                     <FormField
-                                        control={createAbilityCardForm.control}
+                                        control={EditAbiliyCardForm.control}
                                         name='nom'
                                         render={({ field }) => (
                                             <FormItem>
@@ -103,7 +108,7 @@ export default function CreateAbilityCards() {
                                         )}
                                     />
                                     <FormField
-                                        control={createAbilityCardForm.control}
+                                        control={EditAbiliyCardForm.control}
                                         name='description'
                                         render={({ field }) => (
                                             <FormItem>
@@ -117,7 +122,7 @@ export default function CreateAbilityCards() {
                                     />
 
                                     <FormField
-                                        control={createAbilityCardForm.control}
+                                        control={EditAbiliyCardForm.control}
                                         name="attribut"
                                         render={({ field }) => (
                                             <FormItem className="w-full">
@@ -152,7 +157,7 @@ export default function CreateAbilityCards() {
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-3">
                                     <FormField
-                                        control={createAbilityCardForm.control}
+                                        control={EditAbiliyCardForm.control}
                                         name='maxPerDeck'
                                         render={({ field }) => (
                                             <FormItem>
@@ -165,7 +170,7 @@ export default function CreateAbilityCards() {
                                         )}
                                     />
                                     <FormField
-                                        control={createAbilityCardForm.control}
+                                        control={EditAbiliyCardForm.control}
                                         name="bonus"
                                         render={({ field }) => (
                                             <FormItem className="w-full">
@@ -189,7 +194,7 @@ export default function CreateAbilityCards() {
                                         )}
                                     />
                                     <FormField
-                                        control={createAbilityCardForm.control}
+                                        control={EditAbiliyCardForm.control}
                                         name="malus"
                                         render={({ field }) => (
                                             <FormItem className="w-full">
@@ -222,7 +227,7 @@ export default function CreateAbilityCards() {
                                 <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                                     {
                                         AbilityCardsEffects.map((a, index) => <FormField key={index}
-                                            control={createAbilityCardForm.control}
+                                            control={EditAbiliyCardForm.control}
                                             name={a.controler as "attribut" | "bonus" | "malus" | "nom" | "description" | "maxPerDeck" | "stopGate" | "blockGate" | "swipeGate" | "moveSelf" | "moveOpponent" | "moveAnOther" | "attractOpponent" | "cancelAbilities" | "protectFromGate" | "protectFromAbilities" | "drainAbilityPower"}
                                             render={({ field }) => (
                                                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
@@ -247,7 +252,7 @@ export default function CreateAbilityCards() {
                             </Card>
 
                             <Button type="submit" disabled={mutation.isPending ? true : false} >
-                                {mutation.isPending ? 'Submiting in process...' : 'Create Ability Card'}
+                                {mutation.isPending ? 'Submiting in process...' : 'Update Ability Card'}
                             </Button>
                         </form>
                     </Form>
@@ -255,6 +260,7 @@ export default function CreateAbilityCards() {
 
             </Card>
             <Toaster />
+
         </>
     )
 }

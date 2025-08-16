@@ -20,7 +20,7 @@ import { EditBakuganAction } from "@/src/actions/game-designer/manage-bakugan/ed
 
 export type editBakugan_type = z.infer<typeof EditBakuganSchema>
 
-export default function EditBakugan({ id, data }: { id :string , data: GetBakuganForEditorType }) {
+export default function EditBakugan({ id, data }: { id :string , data: GetBakuganForEditorType | undefined }) {
 
     const router = useRouter()
     const editBakuganForm = useForm<editBakugan_type>({
@@ -38,8 +38,6 @@ export default function EditBakugan({ id, data }: { id :string , data: GetBakuga
         queryClient.invalidateQueries({
             queryKey: ["get-bakugans"]
         })
-        console.log('clicked')
-
     }
 
     const mutation = useMutation({
