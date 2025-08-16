@@ -1,8 +1,8 @@
-type values = {
+export type values = {
     value: string,
     label: string
-} 
-    
+}
+
 export const niveauDePuissance_values: values[] = [
     {
         value: '225',
@@ -22,7 +22,7 @@ export const niveauDePuissance_values: values[] = [
     },
     {
         value: '325',
-        label: '325' 
+        label: '325'
     },
     {
         value: '350',

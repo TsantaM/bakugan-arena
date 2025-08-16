@@ -1,8 +1,6 @@
 'use client'
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
 import { addBakuganSchema } from "./add-bakugans-zod";
 import z from "zod";
 import { useForm } from "react-hook-form";
@@ -11,14 +9,26 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } fr
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { niveauDePuissance_values } from "./add-bakugan-values";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CreateBakugan } from "@/src/actions/game-designer/manage-bakugan/create-bakugan";
 import { toast } from "sonner";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Toaster } from "@/components/ui/sonner";
+import { AttributTable } from "@/src/variables/attribut";
 
 export type addBakugan_type = z.infer<typeof addBakuganSchema>
 
 export default function AddBakugan() {
+
+    const queryClient = useQueryClient()
+
+    const handleRefetch = () => {
+        queryClient.invalidateQueries({
+            queryKey: ["get-bakugans"]
+        })
+        console.log('clicked')
+
+    }
 
     const addBakuganForm = useForm<addBakugan_type>({
         resolver: zodResolver(addBakuganSchema), defaultValues: {
@@ -32,8 +42,9 @@ export default function AddBakugan() {
     const mutation = useMutation({
         mutationFn: (formData: addBakugan_type) => CreateBakugan({ formData }),
         onSuccess: () => {
-            toast.success('Bakugan successfully')
+            toast.success('Bakugan created successfully')
             addBakuganForm.reset();
+            handleRefetch();
         },
         onError: (error) => {
             console.error("Erreur lors de la création :", error);
@@ -45,21 +56,21 @@ export default function AddBakugan() {
         mutation.mutate(formData)
     }
 
+    console.log(addBakuganForm.formState.errors)
+
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button variant='outline'><Plus /> Add new Bakugan</Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Add new Bakugan in Game</DialogTitle>
-                    <DialogDescription>
+
+        <>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Add new Bakugan in Game</CardTitle>
+                    <CardDescription>
                         Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit quia commodi dicta quasi quisquam. Ut vel ad enim nesciunt nisi.
-                    </DialogDescription>
-                </DialogHeader>
-                <Form {...addBakuganForm}>
-                    <form onSubmit={addBakuganForm.handleSubmit(onSubmit)} className="flex flex-col space-y-5 max-h-[75vh] overflow-y-auto">
-                        <div className="flex flex-col space-y-5 max-h-[75vh] overflow-y-auto">
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Form {...addBakuganForm}>
+                        <form onSubmit={addBakuganForm.handleSubmit(onSubmit)} className="flex flex-col space-y-5">
                             <FormField
                                 control={addBakuganForm.control}
                                 name='nom'
@@ -100,12 +111,9 @@ export default function AddBakugan() {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem value="Pyrus">Pyrus</SelectItem>
-                                                <SelectItem value="Ventuus">Ventus</SelectItem>
-                                                <SelectItem value="Aquos">Aquos</SelectItem>
-                                                <SelectItem value="Subterra">Subterra</SelectItem>
-                                                <SelectItem value="Haos">Haos</SelectItem>
-                                                <SelectItem value="Darkus">Darkus</SelectItem>
+                                                {
+                                                    AttributTable.map((a, index) => <SelectItem key={index} value={a.value}>{a.label}</SelectItem>)
+                                                }
                                             </SelectContent>
                                         </Select>
                                         <FormDescription>
@@ -124,7 +132,7 @@ export default function AddBakugan() {
                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                                             <FormControl>
                                                 <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder="Select Bakugan Attribut" />
+                                                    <SelectValue placeholder="Select Bakugan Power Level" />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
@@ -140,17 +148,14 @@ export default function AddBakugan() {
                                     </FormItem>
                                 )}
                             />
-                        </div>
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button variant='outline' onClick={() => addBakuganForm.reset()}>Cancel</Button>
-                            </DialogClose>
-                            <Button type="submit"disabled={mutation.isPending ? true : false} >{mutation.isPending ? 'Submiting in process' : 'Create Bakugan'}</Button>
-                        </DialogFooter>
-                    </form>
-                </Form>
-                    <Toaster />
-            </DialogContent>
-        </Dialog>
+                            <Button type="submit" disabled={mutation.isPending ? true : false} >{mutation.isPending ? 'Submiting in process...' : 'Create Bakugan'}</Button>
+                        </form>
+                    </Form>
+                </CardContent>
+            </Card>
+            <Toaster />
+        </>
+
+
     )
 }
