@@ -20,7 +20,6 @@ export default function GamedesignerPage() {
                         <li><Button variant='outline' asChild><Link href='/dashboard/game-designer/manage-bakugans'>Manage Bakugans</Link></Button></li>
                         <li><Button variant='outline' asChild><Link href='/dashboard/game-designer/manage-ability-cards'>Manage Ability Cards</Link></Button></li>
                         <li><Button variant='outline' asChild><Link href='/dashboard/game-designer/manage-exclusives-ability-cards'>Manage Exclusives Ability Cards</Link></Button></li>
-                        <li><Button variant='outline' asChild><Link href='/dashboard/game-designer/manage-bakugans'>Manage Gate Cards</Link></Button></li>
                     </ul>
                 </CardContent>
             </Card>
