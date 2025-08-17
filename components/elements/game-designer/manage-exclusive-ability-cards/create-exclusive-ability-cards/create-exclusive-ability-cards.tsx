@@ -232,7 +232,7 @@ export default function CreateExclusiveAbilityCards() {
                                                     <div className="space-y-0.5">
                                                         <FormLabel>{a.label}</FormLabel>
                                                         <FormDescription>
-                                                            Annule tous les effets de la gate
+                                                            {a.description}
                                                         </FormDescription>
                                                     </div>
                                                     <FormControl>
