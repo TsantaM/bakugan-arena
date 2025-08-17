@@ -1,7 +1,6 @@
 'use client'
 
 import z from "zod"
-import { createGateCardSchema } from "./create-gate-card-zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,31 +11,37 @@ import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { CreateGateCardAction } from "@/src/actions/game-designer/manage-gate-cards/create-gate-card-action"
+import { getGateCardForEditorType } from "@/src/actions/game-designer/manage-gate-cards/get-gate-card-for-editor"
+import { editGateCardSchema } from "./edit-gate-card-zod"
+import { EditGateCardAction } from "@/src/actions/game-designer/manage-gate-cards/edit-gate-card-action"
+import { useRouter } from "next/navigation"
 
-export type createGateCard_type = z.infer<typeof createGateCardSchema>
+export type editGateCard_type = z.infer<typeof editGateCardSchema>
 
-export default function CreateGateCard() {
+export default function EditGateCard({id, cardData} : {id: string, cardData: getGateCardForEditorType | undefined}) {
 
-    const CreateGateCardForm = useForm({
-        resolver: zodResolver(createGateCardSchema), defaultValues: {
-            nom: '',
-            description: '',
-            maxPerDeck: 1,
-            key: ''
+    const router = useRouter()
+
+    const EditGateCardForm = useForm({
+        resolver: zodResolver(editGateCardSchema), defaultValues: {
+            nom: cardData?.nom,
+            description: cardData?.description,
+            maxPerDeck: cardData?.maxPerDeck,
+            key: cardData?.key
         }
     })
 
-    const CreateGateCardFunction = async (formData: createGateCard_type) => {
-        return await CreateGateCardAction(formData)
+    const EditGateCardFunction = async (formData: editGateCard_type) => {
+        return await EditGateCardAction({id, formData})
     }
 
-    const CreateGateCardMuation = useMutation({
-        mutationFn: CreateGateCardFunction,
+    const EditGateCardMuation = useMutation({
+        mutationFn: EditGateCardFunction,
         mutationKey: ['createGateCard'],
         onSuccess: () => {
             toast.success('Gate Card created successfully!')
-            CreateGateCardForm.reset()
+            EditGateCardForm.reset()
+            router.push('/dashboard/game-designer/manage-gate-cards')
         },
         onError: (error) => {
             console.error("Erreur lors de la création :", error);
@@ -44,8 +49,8 @@ export default function CreateGateCard() {
         }
     })
 
-    const onSubmit = (formData: createGateCard_type) => {
-        CreateGateCardMuation.mutate(formData)
+    const onSubmit = (formData: editGateCard_type) => {
+        EditGateCardMuation.mutate(formData)
     }
 
     return (
@@ -58,10 +63,10 @@ export default function CreateGateCard() {
                 </CardHeader>
 
                 <CardContent>
-                    <Form {...CreateGateCardForm}>
-                        <form onSubmit={CreateGateCardForm.handleSubmit(onSubmit)} className="flex flex-col space-y-5">
+                    <Form {...EditGateCardForm}>
+                        <form onSubmit={EditGateCardForm.handleSubmit(onSubmit)} className="flex flex-col space-y-5">
                             <FormField
-                                control={CreateGateCardForm.control}
+                                control={EditGateCardForm.control}
                                 name='nom'
                                 render={({ field }) => (
                                     <FormItem>
@@ -74,7 +79,7 @@ export default function CreateGateCard() {
                                 )}
                             />
                             <FormField
-                                control={CreateGateCardForm.control}
+                                control={EditGateCardForm.control}
                                 name='key'
                                 render={({ field }) => (
                                     <FormItem>
@@ -87,7 +92,7 @@ export default function CreateGateCard() {
                                 )}
                             />
                             <FormField
-                                control={CreateGateCardForm.control}
+                                control={EditGateCardForm.control}
                                 name='description'
                                 render={({ field }) => (
                                     <FormItem>
@@ -100,7 +105,7 @@ export default function CreateGateCard() {
                                 )}
                             />
                             <FormField
-                                control={CreateGateCardForm.control}
+                                control={EditGateCardForm.control}
                                 name='maxPerDeck'
                                 render={({ field }) => (
                                     <FormItem>
@@ -113,7 +118,7 @@ export default function CreateGateCard() {
                                 )}
                             />
 
-                            <Button type="submit" disabled={CreateGateCardMuation.isPending ? true : false} >{CreateGateCardMuation.isPending ? 'Submiting in process...' : 'Create Bakugan'}</Button>
+                            <Button type="submit" disabled={EditGateCardMuation.isPending ? true : false} >{EditGateCardMuation.isPending ? 'Submiting in process...' : 'Update Gate Card'}</Button>
                         </form>
                     </Form>
                 </CardContent>

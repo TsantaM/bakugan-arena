@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const createGateCardSchema = z.object({
+export const editGateCardSchema = z.object({
     nom: z.string(),
     description: z.string(),
     maxPerDeck: z.union([

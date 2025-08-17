@@ -1,3 +1,4 @@
+import ManageGateCardsList from "@/components/elements/game-designer/manage-gate-card/manage-gate-cards-list"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader } from "@/components/ui/card"
 import Section from "@/components/ui/section"
@@ -24,6 +25,7 @@ export default async function ManageGateCardsPage() {
                             <Button variant='outline' asChild><Link href='/dashboard/game-designer/manage-gate-cards/create-gate-card'><Plus /> Add new Gate Card</Link></Button>
                         </div>
                     </CardHeader>
+                    <ManageGateCardsList />
                 </Card>
             </Section>
         </>
