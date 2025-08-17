@@ -1,5 +1,6 @@
 'use server'
 
+import ExclusiveAbilityCardList from "@/components/elements/game-designer/manage-exclusive-ability-cards/exclusive-ability-cards-list"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader } from "@/components/ui/card"
 import Section from "@/components/ui/section"
@@ -27,6 +28,8 @@ export default async function ManageExclusivesAbilityCardsPage() {
                             <Button variant='outline' asChild><Link href='/dashboard/game-designer/manage-exclusives-ability-cards/create-exclusives-ability-cards'><Plus /> Add new Ability Card</Link></Button>
                         </div>
                     </CardHeader>
+                    
+                    <ExclusiveAbilityCardList />
                 </Card>
             </Section>
 
