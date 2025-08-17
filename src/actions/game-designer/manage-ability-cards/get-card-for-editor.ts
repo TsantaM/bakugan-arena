@@ -16,21 +16,9 @@ export const GetAbilityForEditor = async (id: string) => {
             select: {
                 nom: true,
                 description: true,
-                attributs: true,
+                key: true,
                 maxPerDeck: true,
-                bonus: true,
-                malus: true,
-                stopGate: true,
-                blockGate: true,
-                swipeGate: true,
-                moveSelf: true,
-                moveOpponent: true,
-                moveAnOther: true,
-                attractOpponent: true,
-                cancelAbilities: true,
-                protectFromGate: true,
-                protectFromAbilities: true,
-                drainAbilityPower: true,
+                attributs: true
             }
         })
     }
