@@ -1,4 +1,4 @@
-type SwitchType = {
+export type SwitchType = {
     label: string;
     controler: string;
     description: string;

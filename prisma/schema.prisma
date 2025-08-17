@@ -122,3 +122,13 @@ model ExclusivesAbilityCards {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// Gate Card
+
+model GateCards {
+  id          String   @id @default(uuid())
+  nom         String   @unique
+  description String
+  maxPerDeck  Int      @default(3)
+  key         String   @default("")
+}
