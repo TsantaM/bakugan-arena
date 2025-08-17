@@ -2,7 +2,6 @@
 
 import { useForm } from "react-hook-form"
 import z from "zod"
-import { createExclusiveAbilityCardSchema } from "./create-exclusive-ability-cards-zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
@@ -14,44 +13,51 @@ import { Switch } from "@/components/ui/switch";
 import { AbilityCardsEffects } from "@/src/variables/ability-cards-effects";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner"
-import { GetBakugansForExclusivesCards } from "@/src/actions/game-designer/manage-exclusives-ability-cards/get-not-compatibles-bakugans"
+import { GetCompatibleBakugans, GetNotCompatibleBakugans } from "@/src/actions/game-designer/manage-exclusives-ability-cards/get-not-compatibles-bakugans"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { MultiSelect } from "@/components/ui/multi-select.tsx"
-import { CreateExclusiveAbilityCardsAction } from "@/src/actions/game-designer/manage-exclusives-ability-cards/create-exclusive-ability-cards-action"
 import { toast } from "sonner"
+import { EditExclusiveAbilityCardSchema } from "./edit-exclusive-ability-card-zod";
+import { GetExclusiveAbilityCardForEditorType } from "@/src/actions/game-designer/manage-exclusives-ability-cards/get-exclusive-ability-cards-for-editor";
+import { EditExclusiveAbilityCardsAction, RemoveCompatibleBakugan } from "@/src/actions/game-designer/manage-exclusives-ability-cards/edit-exclusive-ability-cards-action";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 
-export type createExclusiveAbilityCard_type = z.infer<typeof createExclusiveAbilityCardSchema>
+export type editExclusiveAbilityCard_type = z.infer<typeof EditExclusiveAbilityCardSchema>
 
-export default function CreateExclusiveAbilityCards() {
+export default function EditExclusiveAbilityCards({ id, cardData }: { id: string, cardData: GetExclusiveAbilityCardForEditorType | undefined }) {
 
-    const createExclusiveAbilityCardsForm = useForm<createExclusiveAbilityCard_type>({
-        resolver: zodResolver(createExclusiveAbilityCardSchema), defaultValues: {
-            nom: '',
-            description: '',
+    const router = useRouter()
 
-            maxPerDeck: 1,
-            bonus: '0',
-            malus: '0',
+    const editExclusiveAbilityCardsForm = useForm<editExclusiveAbilityCard_type>({
+        resolver: zodResolver(EditExclusiveAbilityCardSchema), defaultValues: {
+            nom: cardData?.nom,
+            description: cardData?.description,
 
-            stopGate: false,
-            blockGate: false,
-            swipeGate: false,
-            moveSelf: false,
-            moveOpponent: false,
-            moveAnOther: false,
-            attractOpponent: false,
-            cancelAbilities: false,
-            protectFromGate: false,
-            protectFromAbilities: false,
-            drainAbilityPower: false,
+            maxPerDeck: cardData?.maxPerDeck,
+            bonus: cardData?.bonus as "0" | "50" | "75" | "100" | "150" | "200" | undefined,
+            malus: cardData?.malus as "0" | "50" | "75" | "100" | "150" | "200" | undefined,
+
+            stopGate: cardData?.stopGate,
+            blockGate: cardData?.blockGate,
+            swipeGate: cardData?.swipeGate,
+            moveSelf: cardData?.moveSelf,
+            moveOpponent: cardData?.moveOpponent,
+            moveAnOther: cardData?.moveAnOther,
+            attractOpponent: cardData?.attractOpponent,
+            cancelAbilities: cardData?.cancelAbilities,
+            protectFromGate: cardData?.protectFromGate,
+            protectFromAbilities: cardData?.protectFromAbilities,
+            drainAbilityPower: cardData?.drainAbilityPower,
 
             bakugans: []
         }
     });
 
-    const getBakugans = async (): Promise<{ value: string; label: string }[]> => {
-        const bakugans = await GetBakugansForExclusivesCards();
+    const getNotCompatibleBakugans = async (): Promise<{ value: string; label: string }[]> => {
+        const bakugans = await GetNotCompatibleBakugans(id);
 
         const filtered = bakugans.map((b) => {
             return {
@@ -63,14 +69,19 @@ export default function CreateExclusiveAbilityCards() {
         return filtered;
     };
 
-    const { data } = useQuery({
-        queryKey: ['getBakugansForExclusivesCards'],
-        queryFn: getBakugans,
+    const getCompatibleBakugans = async () => {
+        return await GetCompatibleBakugans(id)
+    }
+
+    const compatibleBakugans = useQuery({
+        queryKey: ['get-compatible-bakugans'],
+        queryFn: getCompatibleBakugans
     })
 
-    const CreateExclusiveAbilityCard = async (formData: createExclusiveAbilityCard_type) => {
-        return await CreateExclusiveAbilityCardsAction(formData)
-    }
+    const notCompatibleBakugans = useQuery({
+        queryKey: ['get-not-compatible-bakugansfor-editor'],
+        queryFn: getNotCompatibleBakugans,
+    })
 
     const queryClient = useQueryClient()
 
@@ -81,13 +92,14 @@ export default function CreateExclusiveAbilityCards() {
         console.log('clicked')
 
     }
-    
-    const mutation = useMutation({
-        mutationFn: (formData: createExclusiveAbilityCard_type) => CreateExclusiveAbilityCard(formData),
+
+    const removeCompatibleBakugan = useMutation({
+        mutationFn: (bakuganId: string) => RemoveCompatibleBakugan({ id, bakuganId }),
         onSuccess: () => {
-            toast.success('Ability Card created successfully')
-            createExclusiveAbilityCardsForm.reset();
+            notCompatibleBakugans.refetch()
+            compatibleBakugans.refetch()
             refetchExclusiveCards()
+            toast.success('Ability Card updated successfully')
         },
         onError: (error) => {
             console.error("Erreur lors de la création :", error);
@@ -95,8 +107,29 @@ export default function CreateExclusiveAbilityCards() {
         }
     })
 
-    const onSubmit = (formData: createExclusiveAbilityCard_type) => {
-        mutation.mutate(formData)
+    const UpdateExclusiveAbilityCard = async (formData: editExclusiveAbilityCard_type) => {
+        return await EditExclusiveAbilityCardsAction({ id, formData })
+    }
+
+    const updateExclusiveCard = useMutation({
+        mutationFn: (formData: editExclusiveAbilityCard_type) => UpdateExclusiveAbilityCard(formData),
+        onSuccess: () => {
+            notCompatibleBakugans.refetch()
+            compatibleBakugans.refetch()
+            toast.success('Ability Card updated successfully')
+            editExclusiveAbilityCardsForm.reset();
+            refetchExclusiveCards()
+            router.push('/dashboard/game-designer/manage-exclusives-ability-cards')
+
+        },
+        onError: (error) => {
+            console.error("Erreur lors de la création :", error);
+            toast.error(error.message)
+        }
+    })
+
+    const onSubmit = (formData: editExclusiveAbilityCard_type) => {
+        updateExclusiveCard.mutate(formData)
     }
 
     return (
@@ -109,8 +142,8 @@ export default function CreateExclusiveAbilityCards() {
                 </CardHeader>
 
                 <CardContent>
-                    <Form {...createExclusiveAbilityCardsForm}>
-                        <form onSubmit={createExclusiveAbilityCardsForm.handleSubmit(onSubmit)} className="flex flex-col space-y-5">
+                    <Form {...editExclusiveAbilityCardsForm}>
+                        <form onSubmit={editExclusiveAbilityCardsForm.handleSubmit(onSubmit)} className="flex flex-col space-y-5">
 
                             <Card>
                                 <CardHeader>
@@ -118,7 +151,7 @@ export default function CreateExclusiveAbilityCards() {
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-3">
                                     <FormField
-                                        control={createExclusiveAbilityCardsForm.control}
+                                        control={editExclusiveAbilityCardsForm.control}
                                         name='nom'
                                         render={({ field }) => (
                                             <FormItem>
@@ -131,7 +164,7 @@ export default function CreateExclusiveAbilityCards() {
                                         )}
                                     />
                                     <FormField
-                                        control={createExclusiveAbilityCardsForm.control}
+                                        control={editExclusiveAbilityCardsForm.control}
                                         name='description'
                                         render={({ field }) => (
                                             <FormItem>
@@ -155,7 +188,7 @@ export default function CreateExclusiveAbilityCards() {
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-3">
                                     <FormField
-                                        control={createExclusiveAbilityCardsForm.control}
+                                        control={editExclusiveAbilityCardsForm.control}
                                         name='maxPerDeck'
                                         render={({ field }) => (
                                             <FormItem>
@@ -168,7 +201,7 @@ export default function CreateExclusiveAbilityCards() {
                                         )}
                                     />
                                     <FormField
-                                        control={createExclusiveAbilityCardsForm.control}
+                                        control={editExclusiveAbilityCardsForm.control}
                                         name="bonus"
                                         render={({ field }) => (
                                             <FormItem className="w-full">
@@ -192,7 +225,7 @@ export default function CreateExclusiveAbilityCards() {
                                         )}
                                     />
                                     <FormField
-                                        control={createExclusiveAbilityCardsForm.control}
+                                        control={editExclusiveAbilityCardsForm.control}
                                         name="malus"
                                         render={({ field }) => (
                                             <FormItem className="w-full">
@@ -225,7 +258,7 @@ export default function CreateExclusiveAbilityCards() {
                                 <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                                     {
                                         AbilityCardsEffects.map((a, index) => <FormField key={index}
-                                            control={createExclusiveAbilityCardsForm.control}
+                                            control={editExclusiveAbilityCardsForm.control}
                                             name={a.controler as "bonus" | "malus" | "nom" | "description" | "maxPerDeck" | "stopGate" | "blockGate" | "swipeGate" | "moveSelf" | "moveOpponent" | "moveAnOther" | "attractOpponent" | "cancelAbilities" | "protectFromGate" | "protectFromAbilities" | "drainAbilityPower"}
                                             render={({ field }) => (
                                                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
@@ -257,14 +290,14 @@ export default function CreateExclusiveAbilityCards() {
                                 </CardHeader>
                                 <CardContent>
                                     <FormField
-                                        control={createExclusiveAbilityCardsForm.control}
+                                        control={editExclusiveAbilityCardsForm.control}
                                         name="bakugans"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Select Compatibles Bakugans</FormLabel>
                                                 <FormControl>
                                                     <MultiSelect
-                                                        options={data || []}
+                                                        options={notCompatibleBakugans.data || []}
                                                         value={field.value}
                                                         onValueChange={field.onChange}
                                                         placeholder="Choose bakugans..."
@@ -276,8 +309,25 @@ export default function CreateExclusiveAbilityCards() {
                                 </CardContent>
                             </Card>
 
-                            <Button type="submit" disabled={mutation.isPending ? true : false}>
-                                {mutation.isPending ? 'Submiting in process...' : 'Create Exclusive Ability Card'}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Remove compatible Bakugan</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="flex w-full flex-wrap gap-2">
+                                        {
+                                            compatibleBakugans.data?.map((b, index) => <Badge key={index} variant="outline" className="flex items-center justify-between">
+                                                {`${b.nom} ${b.attribut}`}
+                                                <Button variant="ghost" onClick={() => removeCompatibleBakugan.mutate(b.id)}><X /></Button>
+                                            </Badge>)
+                                        }
+
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Button type="submit" disabled={updateExclusiveCard.isPending ? true : false}>
+                                {updateExclusiveCard.isPending ? 'Submiting in process...' : 'Update Exclusive Ability Card'}
                             </Button>
                         </form>
                     </Form>
