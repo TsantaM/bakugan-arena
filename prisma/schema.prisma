@@ -103,6 +103,7 @@ model Bakugan {
   niveauDePuissance Int      @default(250)
   image             String
 
+  GateCards              GateCards[]
   ExclusivesAbilityCards ExclusivesAbilityCards[] @relation("exclusivesAbilities")
 
   createdAt DateTime @default(now())
@@ -166,7 +167,6 @@ model ExclusivesAbilityCards {
   protectFromAbilities Boolean @default(false) // protège contre les maitrises de l'adversaire
   drainAbilityPower    Boolean @default(false) // Absorbe tous les points ajouté à l'adversaire
 
-
   // Équilibrage optionnel
   // rarete       Rarete   @default.RARE     // Enum à définir : RARE, ULTRA, LEGENDAIRE...
   // cout         Int      @default(2)       // coût dans le deck ou système de build
@@ -174,4 +174,86 @@ model ExclusivesAbilityCards {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Gate Card
+
+// Card Type :
+
+enum CardType {
+  Elementary
+  Character
+  Command
+  Trap
+}
+
+enum TargetOfCard {
+  Howner
+  Opponent
+  All
+  Winner
+}
+
+model GateCards {
+  id          String   @id @default(uuid())
+  nom         String   @unique
+  description String
+  category    CardType @default(Elementary)
+  maxPerDeck  Int      @default(3)
+  bakugan     Bakugan? @relation(fields: [bakuganId], references: [id])
+  bakuganId   String?
+
+  /// 🌀 ATTRIBUTS
+  attributFirst  Attribut?
+  attributSecond Attribut?
+
+  // Activation automatique
+  auto Boolean? @default(false) //Si c'est true, une condition d'activation effect 1 doit être précisée
+
+  // Effets de base
+  countGates    Boolean? @default(false)
+  countSameAttr Boolean? @default(false)
+  turnLimit     Int?     @default(0)
+
+  // Conditions d'activation effet 1
+  Effect1_Conditions_MinBakugans Int?    @default(0) // Le première effet de la carte s'active quand le nombre de bakugan attendu est atteint (seulement si ce champs est > 0 )
+  Effect1_Conditions_FightEnd    Boolean @default(false) // Le premier effet de la carte s'active à la fin du combat (ex: Sand Trap empêche le gagnant de quitter le champ de batail)
+
+  // Cible de l'effet 1
+  Effect1_target TargetOfCard?
+
+  // Effets 1
+  Effect1_bonus                  Int? // 0 | 50 | 75 | 100 | 200
+  Effect1_malus                  Int?
+  Effect1_elimination            Boolean? @default(false)
+  Effect1_blockElementAbilities  Boolean? @default(false)
+  Effect1_blockEntries           Boolean? @default(false)
+  Effect1_noRetreat              Boolean? @default(false)
+  Effect1_twoBasePower           Boolean? @default(false)
+  Effect1_swipePower             Boolean? @default(false)
+  Effect1_drainOponent           Boolean? @default(false)
+  Effect1_changeTargetAttr       Boolean? @default(false) //Si à true, il devient obligatoire de renseigner 1 attribut
+  Effect1_changeAttrExeptSecAtrr Boolean? @default(false) // Si à true, il devient obligatoire de renseigner 2 attribut
+  Effect1_addCard                Int?     @default(0)
+
+  // Conditions d'activation effet 2
+  Effect2_Conditions_MinBakugans Int?    @default(0) // Le deuième effet de la carte s'active quand le nombre de bakugan attendu est atteint (seulement si ce champs est > 0 )
+  Effect2_Conditions_FightEnd    Boolean @default(false) // Le deuxième effet de la carte s'active à la fin du combat (ex: Sand Trap empêche le gagnant de quitter le champ de batail)
+
+  // Cible de l'effet 2
+  Effect2_target TargetOfCard?
+
+  // Effets 2
+  Effect2_bonus                  Int? // 0 | 50 | 75 | 100 | 200
+  Effect2_malus                  Int?
+  Effect2_elimination            Boolean? @default(false)
+  Effect2_blockElementAbilities  Boolean? @default(false)
+  Effect2_blockEntries           Boolean? @default(false)
+  Effect2_noRetreat              Boolean? @default(false)
+  Effect2_twoBasePower           Boolean? @default(false)
+  Effect2_swipePower             Boolean? @default(false)
+  Effect2_drainOponent           Boolean? @default(false)
+  Effect2_changeTargetAttr       Boolean? @default(false)
+  Effect2_changeAttrExeptSecAtrr Boolean? @default(false)
+  Effect2_addCard                Int?     @default(0)
 }
