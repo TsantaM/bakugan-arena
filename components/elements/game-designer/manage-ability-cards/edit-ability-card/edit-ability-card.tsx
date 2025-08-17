@@ -6,11 +6,6 @@ import { useForm } from "react-hook-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AttributTable } from "@/src/variables/attribut";
-import { BonusAndMalus } from "@/src/variables/bonus-and-malus";
-import { Switch } from "@/components/ui/switch";
-import { AbilityCardsEffects } from "@/src/variables/ability-cards-effects";
 import { Button } from "@/components/ui/button";
 import { EditAbilityCardSchema } from "./edit-ability-card-zod";
 import z from "zod";
@@ -20,6 +15,8 @@ import { EditAbilityCardsAction } from "@/src/actions/game-designer/manage-abili
 import { Toaster } from "@/components/ui/sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AttributTable } from "@/src/variables/attribut";
 
 export type editAbilityCard_type = z.infer<typeof EditAbilityCardSchema>
 
@@ -29,24 +26,9 @@ export default function EditAbilityCard({ id, data }: { id: string, data: GetAbi
         resolver: zodResolver(EditAbilityCardSchema), defaultValues: {
             nom: data?.nom,
             description: data?.description,
-            attribut: data?.attributs,
-
-            maxPerDeck: 1,
-            bonus: data?.bonus as "0" | "50" | "75" | "100" | "150" | "200" | undefined,
-            malus: data?.malus as "0" | "50" | "75" | "100" | "150" | "200" | undefined,
-
-            stopGate: data?.stopGate,
-            blockGate: data?.blockGate,
-            swipeGate: data?.swipeGate,
-            moveSelf: data?.moveSelf,
-            moveOpponent: data?.moveOpponent,
-            moveAnOther: data?.moveAnOther,
-            attractOpponent: data?.attractOpponent,
-            cancelAbilities: data?.cancelAbilities,
-            protectFromGate: data?.protectFromGate,
-            protectFromAbilities: data?.protectFromAbilities,
-            drainAbilityPower: data?.drainAbilityPower
-
+            key: data?.key,
+            maxPerDeck: data?.maxPerDeck,
+            attribut: data?.attributs
         }
     });
 
@@ -112,11 +94,11 @@ export default function EditAbilityCard({ id, data }: { id: string, data: GetAbi
                                         name='description'
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Ability Card Name</FormLabel>
+                                                <FormLabel>Ability Card Description</FormLabel>
                                                 <FormControl>
                                                     <Textarea placeholder="" {...field} className="resize-none" />
                                                 </FormControl>
-                                                <FormDescription>{`The name of the ability card`}</FormDescription>
+                                                <FormDescription>{`The description of the ability card`}</FormDescription>
                                             </FormItem>
                                         )}
                                     />
@@ -130,7 +112,7 @@ export default function EditAbilityCard({ id, data }: { id: string, data: GetAbi
                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger className="w-full">
-                                                            <SelectValue placeholder="Select Bakugan Attribut" />
+                                                            <SelectValue placeholder="Select Card Attribut" />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
@@ -140,113 +122,39 @@ export default function EditAbilityCard({ id, data }: { id: string, data: GetAbi
                                                     </SelectContent>
                                                 </Select>
                                                 <FormDescription>
-                                                    {`The attribut of the Ability Card, if you don't select it will be Pyrus by default`}
+                                                    {`The attribut of the Card`}
                                                 </FormDescription>
                                             </FormItem>
                                         )}
                                     />
 
-                                </CardContent>
-                            </Card>
+                                    <FormField
+                                        control={EditAbiliyCardForm.control}
+                                        name='key'
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Ability Card Key</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="" {...field} className="text" />
+                                                </FormControl>
+                                                <FormDescription>{`The key of the ability card`}</FormDescription>
+                                            </FormItem>
+                                        )}
+                                    />
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>
-                                        Bonus, Malus and Max per Deck
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="flex flex-col gap-3">
                                     <FormField
                                         control={EditAbiliyCardForm.control}
                                         name='maxPerDeck'
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Maximum ped Deck</FormLabel>
+                                                <FormLabel>Max Per Deck</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="" {...field} type="number" min={1} max={3} />
                                                 </FormControl>
-                                                <FormDescription>{`Maximum explemplar of this card in one Deck`}</FormDescription>
+                                                <FormDescription>{`The number of the ability card in deck`}</FormDescription>
                                             </FormItem>
                                         )}
                                     />
-                                    <FormField
-                                        control={EditAbiliyCardForm.control}
-                                        name="bonus"
-                                        render={({ field }) => (
-                                            <FormItem className="w-full">
-                                                <FormLabel>Bonus of the Card</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                    <FormControl>
-                                                        <SelectTrigger className="w-full">
-                                                            <SelectValue placeholder="Select Bakugan Attribut" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {
-                                                            BonusAndMalus.map((a, index) => <SelectItem key={index} value={a.value}>{a.label}</SelectItem>)
-                                                        }
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormDescription>
-                                                    {`The bonus gived by the Ability Card, if you don't select it will be Pyrus by default`}
-                                                </FormDescription>
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={EditAbiliyCardForm.control}
-                                        name="malus"
-                                        render={({ field }) => (
-                                            <FormItem className="w-full">
-                                                <FormLabel>Malus of the Card</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                    <FormControl>
-                                                        <SelectTrigger className="w-full">
-                                                            <SelectValue placeholder="Select Bakugan Attribut" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {
-                                                            BonusAndMalus.map((a, index) => <SelectItem key={index} value={a.value}>{a.label}</SelectItem>)
-                                                        }
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormDescription>
-                                                    {`The malus the Ability Card, if you don't select it will be Pyrus by default`}
-                                                </FormDescription>
-                                            </FormItem>
-                                        )}
-                                    />
-                                </CardContent>
-                            </Card>
-
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Effects of the card</CardTitle>
-                                </CardHeader>
-                                <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                                    {
-                                        AbilityCardsEffects.map((a, index) => <FormField key={index}
-                                            control={EditAbiliyCardForm.control}
-                                            name={a.controler as "attribut" | "bonus" | "malus" | "nom" | "description" | "maxPerDeck" | "stopGate" | "blockGate" | "swipeGate" | "moveSelf" | "moveOpponent" | "moveAnOther" | "attractOpponent" | "cancelAbilities" | "protectFromGate" | "protectFromAbilities" | "drainAbilityPower"}
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                                                    <div className="space-y-0.5">
-                                                        <FormLabel>{a.label}</FormLabel>
-                                                        <FormDescription>
-                                                            Annule tous les effets de la gate
-                                                        </FormDescription>
-                                                    </div>
-                                                    <FormControl>
-                                                        <Switch
-                                                            checked={field.value as boolean}
-                                                            onCheckedChange={field.onChange}
-                                                        />
-                                                    </FormControl>
-                                                </FormItem>
-                                            )}
-                                        />)
-                                    }
 
                                 </CardContent>
                             </Card>
