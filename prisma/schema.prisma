@@ -111,66 +111,13 @@ model Bakugan {
   @@unique([nom, attribut])
 }
 
-model AbilityCard {
-  id          String @id @default(uuid())
-  nom         String @unique
-  description String
-  maxPerDeck  Int    @default(3)
-
-  // Relations
-  attributs Attribut // liaison N-N avec attributs si besoin
-
-  // Statistiques de puissance
-  bonus Int @default(0) // G-Power ajouté
-  malus Int @default(0) // G-Power retiré à l'adversaire
-
-  // Effets spéciaux (booléens pour logique de jeu)
-  stopGate             Boolean @default(false) // Annule tous les effets de la gate
-  blockGate            Boolean @default(false) // Bloque l'ouverture de la gate adverses
-  swipeGate            Boolean @default(false) // Echange la gate avec une autre
-  moveSelf             Boolean @default(false) // Permet de déplacer son propre Bakugan
-  moveOpponent         Boolean @default(false) // Permet de déplacer le Bakugan adverse
-  moveAnOther          Boolean @default(false) // Permet de déplacer un autre bakugan qui est présent sur le champs de batail (alié ou enemie)
-  attractOpponent      Boolean @default(false) // Permet d'attirer un Bakugan sur la carte portail où l'utilisateur se trouve
-  cancelAbilities      Boolean @default(false) // Permet d'annuler les maitrises de l'adversaire
-  protectFromGate      Boolean @default(false) // Protege contre la carte portail de l'adversaire
-  protectFromAbilities Boolean @default(false) // Protège contre les maitrises de l'adversaire
-  drainAbilityPower    Boolean @default(false) // Absorbe tous les points ajouté à l'adversaire
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model ExclusivesAbilityCards {
-  id          String @id @default(uuid())
-  nom         String @unique
+  id          String    @id @default(uuid())
+  nom         String    @unique
   description String
-  maxPerDeck  Int    @default(3)
-
-  // Relation unique à un Bakugan
-  bakugan Bakugan[] @relation("exclusivesAbilities")
-  // Statistiques
-  bonus   Int       @default(0) // G-Power gagné
-  malus   Int       @default(0) // G-Power retiré à l’adversaire
-
-  // Effets spéciaux
-  stopGate             Boolean @default(false) // annule tous les effets de la gate
-  blockGate            Boolean @default(false) // empêche l’adversaire de bénéficier de la gate
-  swipeGate            Boolean @default(false) // échange la gate
-  moveSelf             Boolean @default(false) // déplace le Bakugan utilisateur
-  moveOpponent         Boolean @default(false) // déplace le Bakugan adverse
-  moveAnOther          Boolean @default(false) // Permet de déplacer un autre bakugan qui est présent sur le champs de batail (alié ou enemie)
-  attractOpponent      Boolean @default(false) // permet d'attirer un Bakugan sur sa carte portail
-  cancelAbilities      Boolean @default(false) // permet d'annuler les maitrises de l'adversaire
-  protectFromGate      Boolean @default(false) // protege contre la carte portail de l'adversaire
-  protectFromAbilities Boolean @default(false) // protège contre les maitrises de l'adversaire
-  drainAbilityPower    Boolean @default(false) // Absorbe tous les points ajouté à l'adversaire
-
-
-  // Équilibrage optionnel
-  // rarete       Rarete   @default.RARE     // Enum à définir : RARE, ULTRA, LEGENDAIRE...
-  // cout         Int      @default(2)       // coût dans le deck ou système de build
-  // utilisable   Boolean  @default(true)    // activable ou non (pour gestion admin/test)
+  maxPerDeck  Int       @default(3)
+  bakugan     Bakugan[] @relation("exclusivesAbilities")
+  key         String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
