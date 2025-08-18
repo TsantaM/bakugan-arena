@@ -15,6 +15,8 @@ export const GetExclusiveAbilityCardForEditor = async ( id: string ) => {
             select: {
                 nom: true,
                 description: true,
+                key: true,
+                maxPerDeck: true,
                 bakugan: {
                   select: {
                     id: true,
@@ -23,21 +25,6 @@ export const GetExclusiveAbilityCardForEditor = async ( id: string ) => {
                   }  
                 },
 
-                maxPerDeck: true,
-                bonus: true,
-                malus: true,
-
-                stopGate: true,
-                blockGate: true,
-                swipeGate: true,
-                moveSelf: true,
-                moveOpponent: true,
-                moveAnOther: true,
-                attractOpponent: true,
-                cancelAbilities: true,
-                protectFromGate: true,
-                protectFromAbilities: true,
-                drainAbilityPower: true,
             }
         })
     }
