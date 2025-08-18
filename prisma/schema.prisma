@@ -111,6 +111,22 @@ model Bakugan {
   @@unique([nom, attribut])
 }
 
+// Ability Card
+model AbilityCard {
+  id          String @id @default(uuid())
+  nom         String @unique
+  description String
+  maxPerDeck  Int    @default(3)
+  key         String
+  attributs Attribut
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+
+// Exclusive Avility Cards
 model ExclusivesAbilityCards {
   id          String    @id @default(uuid())
   nom         String    @unique
@@ -123,12 +139,13 @@ model ExclusivesAbilityCards {
   updatedAt DateTime @updatedAt
 }
 
-// Gate Card
 
+
+// Gate Card
 model GateCards {
   id          String   @id @default(uuid())
   nom         String   @unique
   description String
   maxPerDeck  Int      @default(3)
-  key         String   @default("")
+  key         String 
 }
