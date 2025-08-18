@@ -10,12 +10,8 @@ export default function ExclusiveAbilityCardPreview({ data }: { data: GetExclusi
                     {data.nom}
                 </CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-col gap-2">
-                <Card>
-                    <CardContent>
-                        {data.description}
-                    </CardContent>
-                </Card>
+            <CardContent className="flex flex-col gap-3">
+                {data.description}
                 <div className="flex w-full flex-wrap gap-2">
                     {
                         data.bakugan.map((b, index) => <Badge key={index} variant="outline">{`${b.nom} ${b.attribut}`}</Badge>)
