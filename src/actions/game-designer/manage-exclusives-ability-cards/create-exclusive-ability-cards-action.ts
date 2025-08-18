@@ -8,8 +8,6 @@ export const CreateExclusiveAbilityCardsAction = async (formData: createExclusiv
     const user = await getUser()
     const role = await getUserRole()
     const bakugans = formData.bakugans
-    const bonus = parseInt(formData.bonus)
-    const malus = parseInt(formData.malus)
     const maxPerDeck = parseInt(formData.maxPerDeck as string)
 
     if (user && role?.role === "GAMEDESIGNER") {
@@ -20,22 +18,8 @@ export const CreateExclusiveAbilityCardsAction = async (formData: createExclusiv
                 bakugan: {
                     connect: bakugans.map((id) => ({ id }))
                 },
-
                 maxPerDeck: maxPerDeck,
-                bonus: bonus,
-                malus: malus,
-
-                stopGate: formData.stopGate,
-                blockGate: formData.blockGate,
-                swipeGate: formData.swipeGate,
-                moveSelf: formData.moveSelf,
-                moveOpponent: formData.moveOpponent,
-                moveAnOther: formData.moveAnOther,
-                attractOpponent: formData.attractOpponent,
-                cancelAbilities: formData.cancelAbilities,
-                protectFromGate: formData.protectFromGate,
-                protectFromAbilities: formData.protectFromAbilities,
-                drainAbilityPower: formData.drainAbilityPower,
+                key: formData.key
             }
         })
     }
