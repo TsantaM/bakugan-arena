@@ -35,7 +35,7 @@ export default function AddBakugan() {
             nom: '',
             attribut: 'Pyrus',
             image: '',
-            niveauDePuissance: "225"
+            niveauDePuissance: "220"
         }
     });
 

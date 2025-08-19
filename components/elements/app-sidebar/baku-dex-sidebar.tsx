@@ -12,8 +12,8 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { RoleType } from "@/src/actions/getUserSession"
-import { BookOpenText, ChartSpline, Home, KeyRound, SwatchBook } from "lucide-react"
+import { UserType } from "@/src/actions/getUserSession"
+import { Home, SwatchBook } from "lucide-react"
 import Link from "next/link"
 import { ReactNode } from "react"
 
@@ -25,28 +25,23 @@ type LinksDashboardType = {
 
 const LinksDashboard: LinksDashboardType[] = [
     {
-        icone: <Home />,
-        label: 'Dashboard',
-        href: '/dashboard'
-    },
-    {
         icone: <SwatchBook />,
-        label: 'Deck Builder',
-        href: '/dashboard'
-    },
-    {
-        icone: <BookOpenText />,
-        label: 'Baku Dex',
+        label: 'Bakugans',
         href: '/baku-dex'
     },
     {
-        icone: <ChartSpline />,
-        label: 'Ladder',
-        href: '/dashboard'
+        icone: <SwatchBook />,
+        label: 'Ability Cards',
+        href: '/baku-dex'
+    },
+    {
+        icone: <SwatchBook />,
+        label: 'Exclusives Ability Cards',
+        href: '/baku-dex'
     }
 ]
 
-export default function AppSidebar({ role }: { role: RoleType | undefined }) {
+export default function BakuDexSidebar({ user }: { user: UserType | undefined }) {
     return (
         <Sidebar variant="inset">
             <SidebarHeader>
@@ -58,9 +53,21 @@ export default function AppSidebar({ role }: { role: RoleType | undefined }) {
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel>
-                        Navigation
+                        Baku-Dex Navigation
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
+                        {
+                            user && <SidebarMenu>
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton asChild>
+                                        <Link href='/dashboard'>
+                                            <Home/>
+                                            <span>Dashboard</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            </SidebarMenu>
+                        }
                         {
                             LinksDashboard.map((l, index) => <SidebarMenu key={index}>
                                 <SidebarMenuItem>
@@ -72,32 +79,6 @@ export default function AppSidebar({ role }: { role: RoleType | undefined }) {
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             </SidebarMenu>)
-                        }
-
-                        {
-                            role?.role === 'GAMEDESIGNER' && <SidebarMenu>
-                                <SidebarMenuItem>
-                                    <SidebarMenuButton asChild>
-                                        <Link href={'/dashboard/game-designer'}>
-                                            <KeyRound />
-                                            <span>Game Designer</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            </SidebarMenu>
-                        }
-
-                        {
-                            role?.role === 'ADMIN' && <SidebarMenu>
-                                <SidebarMenuItem>
-                                    <SidebarMenuButton asChild>
-                                        <Link href={'/dashboard'}>
-                                            <KeyRound />
-                                            <span>Administration</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            </SidebarMenu>
                         }
 
                     </SidebarGroupContent>

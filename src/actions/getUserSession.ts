@@ -12,6 +12,9 @@ export const getUser = async () => {
     return session?.user
 }
 
+export type UserType = Exclude<Awaited<ReturnType<typeof getUser>>, undefined>
+
+
 export const getUserRole = async() => {
     const user = await getUser()
 

@@ -28,7 +28,7 @@ export default function EditBakugan({ id, data }: { id :string , data: GetBakuga
             nom: data?.nom,
             attribut: data?.attribut,
             image: data?.image,
-            niveauDePuissance: data?.niveauDePuissance as "225" | "250" | "275" | "300" | "325" | "350" | "375" | "400" | "425" | "450" | undefined
+            niveauDePuissance: data?.niveauDePuissance as "220" | "230" | "240" | "250" | "260" | "270" | "280" | "290" | "300" | "310" | "320" | "330" | "340" | "350" | "360" | "370" | "380" | "390" | "400" | "410" | "420" | "430" | "440" | undefined
         }
     });
 

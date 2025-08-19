@@ -14,6 +14,9 @@ export const GetBakugansData = async ({ nom, attribut }: { nom?: string, attribu
             image: true,
             nom: true,
             attribut: true,
+        },
+        orderBy: {
+            nom: 'asc'
         }
     })
 }
