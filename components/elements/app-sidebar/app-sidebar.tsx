@@ -37,7 +37,7 @@ const LinksDashboard: LinksDashboardType[] = [
     {
         icone: <BookOpenText />,
         label: 'Baku Dex',
-        href: '/dashboard'
+        href: '/dashboard/baku-dex'
     },
     {
         icone: <ChartSpline />,
