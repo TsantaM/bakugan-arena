@@ -12,8 +12,10 @@ export const GetExclusivesAbiltyCardsData = async({nom} : {nom?: string}) => {
             id: true,
             nom: true,
             description: true,
+            maxPerDeck: true,
             bakugan: {
                 select: {
+                    id: true,
                     nom: true,
                     attribut: true
                 }

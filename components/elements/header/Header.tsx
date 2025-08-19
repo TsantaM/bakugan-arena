@@ -21,6 +21,10 @@ export default async function Header() {
             name: 'Home',
             href: '/'
         },
+        {
+            name: 'Baku Dex',
+            href: '/baku-dex'
+        }
     ]
 
 

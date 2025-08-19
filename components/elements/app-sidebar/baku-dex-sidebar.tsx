@@ -32,12 +32,12 @@ const LinksDashboard: LinksDashboardType[] = [
     {
         icone: <SwatchBook />,
         label: 'Ability Cards',
-        href: '/baku-dex'
+        href: '/baku-dex/ability-cards'
     },
     {
         icone: <SwatchBook />,
         label: 'Exclusives Ability Cards',
-        href: '/baku-dex'
+        href: '/baku-dex/exclusive-ability-cards'
     }
 ]
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GetBakugansDataType } from "@/src/actions/dex/get-bakugan-data";
 import Link from "next/link";
 import BakuganPreview from "../preview/bakugan-preview";
@@ -15,6 +15,9 @@ export default function BakuDex({ data }: { data: GetBakugansDataType[] }) {
         return (
             <Card>
                 <CardHeader>
+                    <CardTitle>
+                        Bakugans
+                    </CardTitle>
                     <div>
                         <Input placeholder="Bakugan Name" onChange={(e) => setSearch(e.target.value)} />
                     </div>

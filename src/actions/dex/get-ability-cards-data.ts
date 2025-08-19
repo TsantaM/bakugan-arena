@@ -11,7 +11,8 @@ export const GetAbilityCardsData = async ({ nom }: { nom?: string }) => {
             id: true,
             nom: true,
             description: true,
-            attributs: true
+            attributs: true,
+            maxPerDeck: true
         }
     })
 }
