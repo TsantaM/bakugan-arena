@@ -32,7 +32,7 @@ const LinksDashboard: LinksDashboardType[] = [
     {
         icone: <SwatchBook />,
         label: 'Deck Builder',
-        href: '/dashboard'
+        href: '/dashboard/deck-builder'
     },
     {
         icone: <BookOpenText />,
