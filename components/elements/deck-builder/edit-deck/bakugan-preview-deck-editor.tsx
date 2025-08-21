@@ -22,6 +22,8 @@ export default function BakuganPreviewDeckEditor({ nom, image, attribut, id, dec
             toast.success('Bakugan removed from deck successfully!')
             queryClient.invalidateQueries({ queryKey: ['get-bakugans-in-deck'] })
             queryClient.invalidateQueries({ queryKey: ['not-in-deck-bakugans'] })
+            queryClient.invalidateQueries({ queryKey: ['get-ability-cards-in-deck'] })
+            queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-ability-cards'] })
         },
         onError: (error) => {
             toast.error('Failed to remove Bakugan from deck' + error.message)

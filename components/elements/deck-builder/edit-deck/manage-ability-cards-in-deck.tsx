@@ -1,10 +1,9 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { GetBakugansInDeck } from "@/src/actions/deck-builder/get-deck-data"
+import { GetAbilityCardsInDeck } from "@/src/actions/deck-builder/get-deck-data"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Check, ChevronsUpDown } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,70 +19,61 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { useState } from "react"
-import { GetNotInDeckBakugans } from "@/src/actions/deck-builder/get-not-in-deck-data-action"
 import Image from "next/image"
-import { AddBakuganInDeckAction } from "@/src/actions/deck-builder/edit-deck-action"
+import { useState } from "react"
+import { GetNotInDeckAbilityCards } from "@/src/actions/deck-builder/get-not-in-deck-data-action"
+import { AddAbilityCardToDeck } from "@/src/actions/deck-builder/edit-deck-action"
 import { toast } from "sonner"
-import { Toaster } from "@/components/ui/sonner"
-import BakuganPreviewDeckEditor from "./bakugan-preview-deck-editor"
 
-export default function ManageBakugansInDeck({ id }: { id: string }) {
 
-    const queryClient = useQueryClient()
-
-    const deckBakugans = async () => {
-        return await GetBakugansInDeck(id)
-    }
-
-    const deckBakugansQuery = useQuery({
-        queryKey: ['get-bakugans-in-deck'],
-        queryFn: deckBakugans
-    })
-
-    const notInDeckBakugans = async () => {
-        return await GetNotInDeckBakugans({ id })
-    }
-
-    const notInDeckBakugansQuery = useQuery({
-        queryKey: ['not-in-deck-bakugans'],
-        queryFn: notInDeckBakugans
-    })
-
-    const addBakuganToDeck = async (bakuganId: string) => {
-        return await AddBakuganInDeckAction({ bakuganId, deckId: id })
-    }
-
-    const addBakuganToDeckMutation = useMutation({
-        mutationKey: ['add-bakugan-to-deck'],
-        mutationFn: addBakuganToDeck,
-        onSuccess: () => {
-            notInDeckBakugansQuery.refetch()
-            deckBakugansQuery.refetch()
-            queryClient.invalidateQueries({ queryKey: ['get-ability-cards-in-deck'] })
-            queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-ability-cards'] })
-            toast.success('Bakugan added to deck successfully!')
-            setValue('')
-        },
-        onError: (err) => {
-            console.error("Error adding Bakugan to deck:", err)
-        }
-    })
+export default function ManageAbilityCardsInDeck({ id }: { id: string }) {
 
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState("")
+    const queryClient = useQueryClient()
+
+    const deckAbilityCards = async () => {
+        return await GetAbilityCardsInDeck(id)
+    }
+
+    const deckAbilityCardsQuery = useQuery({
+        queryKey: ['get-ability-cards-in-deck'],
+        queryFn: deckAbilityCards
+    })
+
+    const notInDeckAbilities = async () => {
+        return await GetNotInDeckAbilityCards({ id })
+    }
+
+    const notInDeckAbilitiesQuery = useQuery({
+        queryKey: ['get-not-in-deck-ability-cards'],
+        queryFn: notInDeckAbilities
+    })
+
+    const addCardToDeck = async (cardId: string) => {
+        return await AddAbilityCardToDeck({ cardId, deckId: id })
+    }
+
+    const addCardToDeckMutation = useMutation({
+        mutationKey: ['add-ability-card-to-deck'],
+        mutationFn: addCardToDeck,
+        onSuccess: () => {
+            toast.success("Ability card has been added to deck")
+            queryClient.invalidateQueries({ queryKey: ['get-ability-cards-in-deck'] })
+            queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-ability-cards'] })
+            setValue('')
+        }
+    })
 
     return (
-
         <>
-            <Card>
 
+            <Card>
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <CardTitle>
-                            Bakugans
+                            Ability Cards
                         </CardTitle>
-
                         <Popover open={open} onOpenChange={setOpen}>
                             <PopoverTrigger asChild>
                                 <Button
@@ -91,23 +81,23 @@ export default function ManageBakugansInDeck({ id }: { id: string }) {
                                     role="combobox"
                                     aria-expanded={open}
                                     className="w-[200px] justify-between"
-                                    disabled={addBakuganToDeckMutation.isPending || deckBakugansQuery.data?.bakugans.length === 3 ? true : false}
+                                    disabled={addCardToDeckMutation.isPending || deckAbilityCardsQuery.data?.length === 10 ? true : false}
                                 >
-                                    {notInDeckBakugansQuery?.data && value ? (
+                                    {notInDeckAbilitiesQuery?.data && value ? (
                                         (() => {
-                                            const selectedBakugan = notInDeckBakugansQuery.data.find(
-                                                (b) => `${b.nom} ${b.attribut}` === value
+                                            const selectedBakugan = notInDeckAbilitiesQuery.data.find(
+                                                (b) => b.nom === value
                                             )
 
                                             if (!selectedBakugan) return "Select Bakugan..."
 
-                                            const { nom, attribut, image } = selectedBakugan
-                                            const imageUrl = `/images/bakugans/sphere/${image}/${attribut.toUpperCase()}.png`
+                                            const { nom, attributs } = selectedBakugan
+                                            const imageUrl = `/images/attribut/${attributs.toUpperCase()}.png`
 
                                             return (
                                                 <>
-                                                    <Image src={imageUrl} alt={`${nom} ${attribut}`} width={20} height={20} />
-                                                    {`${nom} ${attribut}`}
+                                                    <Image src={imageUrl} alt={`${attributs}`} width={20} height={20} />
+                                                    {`${nom}`}
                                                 </>
                                             )
                                         })()
@@ -123,18 +113,18 @@ export default function ManageBakugansInDeck({ id }: { id: string }) {
                                     <CommandList>
                                         <CommandEmpty>No framework found.</CommandEmpty>
                                         <CommandGroup>
-                                            {notInDeckBakugansQuery?.data && notInDeckBakugansQuery?.data.map((b, index) => (
+                                            {notInDeckAbilitiesQuery?.data && notInDeckAbilitiesQuery?.data.map((b, index) => (
                                                 <CommandItem
                                                     key={index}
-                                                    value={`${b.nom} ${b.attribut}`}
+                                                    value={b.nom}
                                                     onSelect={(currentValue) => {
                                                         setValue(currentValue === value ? "" : currentValue)
                                                         setOpen(false)
-                                                        addBakuganToDeckMutation.mutate(b.id)
+                                                        addCardToDeckMutation.mutate(b.id)
                                                     }}
                                                 >
-                                                    <Image src={`/images/bakugans/sphere/${b.image}/${b.attribut.toUpperCase()}.png`} alt={`${b.nom} ${b.attribut}`} width={20} height={20} />
-                                                    {`${b.nom} ${b.attribut}`}
+                                                    <Image src={`/images/attributs/${b.attributs.toUpperCase()}.png`} alt={b.nom} width={20} height={20} />
+                                                    {b.nom}
                                                     <Check
                                                         className={cn(
                                                             "ml-auto",
@@ -151,19 +141,15 @@ export default function ManageBakugansInDeck({ id }: { id: string }) {
                     </div>
                 </CardHeader>
 
-                <CardContent className={deckBakugansQuery.data?.bakugans && deckBakugansQuery.data?.bakugans.length > 0 ? "grid grid-cols-1 lg:grid-cols-3 gap-3" : "flex items-center justify-center"}>
-                    {
-                        deckBakugansQuery.data?.bakugans && deckBakugansQuery.data?.bakugans.length > 0 ? deckBakugansQuery.data?.bakugans.map((b, index) => <BakuganPreviewDeckEditor key={index} id={b.id} attribut={b.attribut} image={b.image} nom={b.nom} deckId={id} />)
+                <CardContent>
 
-                            : <p className='text-center'>No Bakugan in the deck</p>
+                    {
+                        deckAbilityCardsQuery.data && deckAbilityCardsQuery.data.map((c, index) => <p key={index}>{c.abilityCard.nom}</p>)
                     }
                 </CardContent>
 
             </Card>
 
-            <Toaster />
         </>
-
-
     )
 }

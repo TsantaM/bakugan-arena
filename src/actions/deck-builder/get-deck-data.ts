@@ -57,7 +57,8 @@ export const GetAbilityCardsInDeck = async(id: string) => {
                     select: {
                         id: true,
                         nom: true,
-                        description: true
+                        description: true,
+                        attributs: true
                     }
                 }
             }

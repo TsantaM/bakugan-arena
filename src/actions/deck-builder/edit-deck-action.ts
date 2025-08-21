@@ -4,11 +4,11 @@ import { editDeckName_type } from "@/components/elements/deck-builder/edit-deck"
 import { getUser } from "../getUserSession"
 import prisma from "@/src/lib/prisma"
 
-export const EditDeckNameAction = async({id, formData} : {id: string, formData: editDeckName_type}) => {
+export const EditDeckNameAction = async ({ id, formData }: { id: string, formData: editDeckName_type }) => {
 
     const user = await getUser()
 
-    if(user) {
+    if (user) {
         return await prisma.deck.update({
             where: {
                 id: id,
@@ -22,7 +22,7 @@ export const EditDeckNameAction = async({id, formData} : {id: string, formData: 
 
 }
 
-export const AddBakuganInDeckAction = async({bakuganId, deckId} : {bakuganId : string, deckId: string}) => {
+export const AddBakuganInDeckAction = async ({ bakuganId, deckId }: { bakuganId: string, deckId: string }) => {
     const user = await getUser()
 
     const bakuganCount = await prisma.deck.findFirst({
@@ -39,7 +39,7 @@ export const AddBakuganInDeckAction = async({bakuganId, deckId} : {bakuganId : s
         }
     })
 
-    if(user && bakuganCount?.bakugans && bakuganCount?.bakugans.length < 3) {
+    if (user && bakuganCount?.bakugans && bakuganCount?.bakugans.length < 3) {
         return await prisma.deck.update({
             where: {
                 id: deckId,
@@ -57,11 +57,12 @@ export const AddBakuganInDeckAction = async({bakuganId, deckId} : {bakuganId : s
 
 }
 
-export const RemoveBakuganInDeckAction = async({bakuganId, deckId} : {bakuganId : string, deckId: string}) => {
+export const RemoveBakuganInDeckAction = async ({ bakuganId, deckId }: { bakuganId: string, deckId: string }) => {
     const user = await getUser()
 
-    if(user) {
-        return await prisma.deck.update({
+    if (user) {
+
+        await prisma.deck.update({
             where: {
                 id: deckId,
                 userId: user.id
@@ -72,6 +73,67 @@ export const RemoveBakuganInDeckAction = async({bakuganId, deckId} : {bakuganId 
                         id: bakuganId
                     }
                 }
+            }
+        })
+
+        const BakuganAttribut = await prisma.bakugan.findUnique({
+            where: {
+                id: bakuganId
+            },
+            select: {
+                attribut: true
+            }
+        })
+
+
+        console.log(BakuganAttribut)
+
+        const getBakuganInDeckWithSameAttribut = await prisma.deck.findFirst({
+            where: {
+                id: deckId,
+                userId: user.id
+            },
+            select: {
+                bakugans: {
+                    where: {
+                        attribut: BakuganAttribut?.attribut
+                    },
+                    select: {
+                        attribut: true,
+                    }
+                }
+            }
+        })
+
+        console.log(getBakuganInDeckWithSameAttribut)
+
+
+        if (getBakuganInDeckWithSameAttribut?.bakugans.length === 0) {
+
+            const attribut = BakuganAttribut?.attribut
+            await prisma.abilityCardDeck.deleteMany({
+                where: {
+                    deckId: deckId,
+                    abilityCard: {
+                        attributs: attribut
+                    },
+                    deck: {
+                        userId: user.id
+                    }
+                }
+            })
+        }
+    }
+}
+
+export const AddAbilityCardToDeck = async ({ cardId, deckId }: { cardId: string, deckId: string }) => {
+    const user = await getUser()
+
+    if (user) {
+        return prisma.abilityCardDeck.create({
+            data: {
+                deckId: deckId,
+                abilityCardId: cardId
             }
         })
     }
