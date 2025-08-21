@@ -1,4 +1,4 @@
-import Section from "@/components/ui/section"
+import Lobby from "@/components/elements/lobby/lobby"
 import { getUser } from "@/src/actions/getUserSession"
 import { unauthorized } from "next/navigation"
 
@@ -12,8 +12,6 @@ export default async function DashboardPage() {
     }
 
     return (
-        <Section>
-
-        </Section>
+        <Lobby />
     )
 }
