@@ -2,11 +2,12 @@
 
 import prisma from "@/src/lib/prisma"
 import { getUser } from "../getUserSession"
+import { GetBakugansInDeck, GetExclusiveCardsInDeck } from "./get-deck-data"
 
-export const GetNotInDeckBakugans = async({id} : {id: string}) => {
+export const GetNotInDeckBakugans = async ({ id }: { id: string }) => {
     const user = await getUser()
 
-    if(user) {
+    if (user) {
         return await prisma.bakugan.findMany({
             where: {
                 Deck: {
@@ -26,10 +27,10 @@ export const GetNotInDeckBakugans = async({id} : {id: string}) => {
     }
 }
 
-export const GetNotInDeckAbilityCards = async({id} : {id: string}) => {
+export const GetNotInDeckAbilityCards = async ({ id }: { id: string }) => {
     const user = await getUser()
 
-    const abilitiesInDeck = await prisma.abilityCardDeck.findMany({
+    const abilitiesInDeck = await prisma.exclusiveAbilityCardDeck.findMany({
         where: {
             deckId: id,
             deck: {
@@ -37,8 +38,8 @@ export const GetNotInDeckAbilityCards = async({id} : {id: string}) => {
             }
         },
         select: {
-            abilityCardId: true,
-            abilityCard: {
+            exclusiveAbilityCardsId: true,
+            exclusiveAbilityCards: {
                 select: {
                     maxPerDeck: true,
                     id: true
@@ -63,7 +64,7 @@ export const GetNotInDeckAbilityCards = async({id} : {id: string}) => {
 
     const attributs = bakugansInDeck?.bakugans.map((b) => b.attribut)
 
-    const reduced = [...new Set(attributs) ]
+    const reduced = [...new Set(attributs)]
 
     const abilitiesWithSameAttribut = await prisma.abilityCard.findMany({
         where: {
@@ -81,10 +82,47 @@ export const GetNotInDeckAbilityCards = async({id} : {id: string}) => {
     })
 
     const abilitiesNotInDeck = abilitiesWithSameAttribut.filter(card => {
-        const countInDeck = abilitiesInDeck.filter((c) => c.abilityCard.id === card.id).length
+        const countInDeck = abilitiesInDeck.filter((c) => c.exclusiveAbilityCards.id === card.id).length
 
         return countInDeck < card.maxPerDeck
-    } ) 
+    })
 
     return abilitiesNotInDeck
+}
+
+export const GetNotInDeckExclusiveAbilityCards = async ({ id }: { id: string }) => {
+    const user = await getUser()
+
+    if (user) {
+
+        const BakugansInDeck = await GetBakugansInDeck(id)
+
+        const exclusivesAbilityCardsCompatibles = await prisma.exclusivesAbilityCards.findMany({
+            where: {
+                bakugan: {
+                    some: {
+                        id: {
+                            in: BakugansInDeck?.bakugans.map(b => b.id)
+                        }
+                    }
+                }
+            },
+            select: {
+                id: true,
+                nom: true,
+                description: true,
+                maxPerDeck: true
+            }
+        })
+
+        const exclusiveAbilityCardsInDeck = await GetExclusiveCardsInDeck(id)
+
+        const exclusivesNotInDeck = exclusivesAbilityCardsCompatibles.filter(card => {
+            const countInDeck = exclusiveAbilityCardsInDeck ? exclusiveAbilityCardsInDeck.filter((c) => c.exclusiveAbilityCards.id === card.id).length : 0
+
+            return countInDeck < card.maxPerDeck
+        })
+
+        return exclusivesNotInDeck
+    }
 }

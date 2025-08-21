@@ -53,6 +53,7 @@ export const GetAbilityCardsInDeck = async(id: string) => {
                 deckId: id
             },
             select: {
+                id: true,
                 abilityCard: {
                     select: {
                         id: true,
@@ -61,6 +62,11 @@ export const GetAbilityCardsInDeck = async(id: string) => {
                         attributs: true
                     }
                 }
+            },
+            orderBy: {
+                abilityCard:{
+                    attributs: 'desc',
+                },
             }
         })
     }
@@ -75,11 +81,13 @@ export const GetExclusiveCardsInDeck = async(id: string) => {
                 deckId: id
             },
             select: {
+                id: true,
                 exclusiveAbilityCards: {
                     select: {
                         id: true,
                         nom: true,
                         description: true,
+                        maxPerDeck: true,
                     }
                 }
             }

@@ -1,8 +1,10 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { GetAbilityCardsInDeck, GetBakugansInDeck } from "@/src/actions/deck-builder/get-deck-data"
+import { GetBakugansInDeck, GetExclusiveCardsInDeck } from "@/src/actions/deck-builder/get-deck-data"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { ExclusiveAbilityCardPreviewDeckEditor } from "./cards-preview-deck-editor"
+import { GetNotInDeckExclusiveAbilityCards } from "@/src/actions/deck-builder/get-not-in-deck-data-action"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -19,21 +21,17 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import Image from "next/image"
 import { useState } from "react"
-import { GetNotInDeckAbilityCards } from "@/src/actions/deck-builder/get-not-in-deck-data-action"
-import { AddAbilityCardToDeck } from "@/src/actions/deck-builder/edit-deck-action"
 import { toast } from "sonner"
-import CardPreviewDeckEditor from "./cards-preview-deck-editor"
+import { AddExclusiveAbilityCardToDeck } from "@/src/actions/deck-builder/edit-deck-action"
 
-
-export default function ManageAbilityCardsInDeck({ id }: { id: string }) {
+export default function ManageExclusiveAbilityCardsInDeck({ id }: { id: string }) {
 
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState("")
     const queryClient = useQueryClient()
 
-    const countBakugans = async() => {
+    const countBakugans = async () => {
         const list = await GetBakugansInDeck(id)
         const count = list && list.bakugans.length
         return count
@@ -44,27 +42,26 @@ export default function ManageAbilityCardsInDeck({ id }: { id: string }) {
         queryFn: countBakugans
     })
 
-
-    const deckAbilityCards = async () => {
-        return await GetAbilityCardsInDeck(id)
+    const deckExclusiveAbilityCards = async () => {
+        return await GetExclusiveCardsInDeck(id)
     }
 
-    const deckAbilityCardsQuery = useQuery({
-        queryKey: ['get-ability-cards-in-deck'],
-        queryFn: deckAbilityCards
+    const deckExclusiveAbilityCardsQuery = useQuery({
+        queryKey: ['get-exclusive-ability-cards-in-deck'],
+        queryFn: deckExclusiveAbilityCards
     })
 
-    const notInDeckAbilities = async () => {
-        return await GetNotInDeckAbilityCards({ id })
+    const notInDeckExclusiveAbilityCards = async () => {
+        return await GetNotInDeckExclusiveAbilityCards({ id })
     }
 
-    const notInDeckAbilitiesQuery = useQuery({
-        queryKey: ['get-not-in-deck-ability-cards'],
-        queryFn: notInDeckAbilities
+    const notInDeckExclusiveAbilitiesQuery = useQuery({
+        queryKey: ['get-not-in-deck-exclusive-ability-cards'],
+        queryFn: notInDeckExclusiveAbilityCards
     })
 
     const addCardToDeck = async (cardId: string) => {
-        return await AddAbilityCardToDeck({ cardId, deckId: id })
+        return await AddExclusiveAbilityCardToDeck({ cardId, deckId: id })
     }
 
     const addCardToDeckMutation = useMutation({
@@ -72,8 +69,8 @@ export default function ManageAbilityCardsInDeck({ id }: { id: string }) {
         mutationFn: addCardToDeck,
         onSuccess: () => {
             toast.success("Ability card has been added to deck")
-            queryClient.invalidateQueries({ queryKey: ['get-ability-cards-in-deck'] })
-            queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-ability-cards'] })
+            queryClient.invalidateQueries({ queryKey: ['get-exclusive-ability-cards-in-deck'] })
+            queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-exclusive-ability-cards'] })
             setValue('')
         }
     })
@@ -84,9 +81,7 @@ export default function ManageAbilityCardsInDeck({ id }: { id: string }) {
             <Card>
                 <CardHeader>
                     <div className="flex items-center justify-between">
-                        <CardTitle>
-                            Ability Cards
-                        </CardTitle>
+                        <CardTitle>Exclusive Ability Cards</CardTitle>
                         <Popover open={open} onOpenChange={setOpen}>
                             <PopoverTrigger asChild>
                                 <Button
@@ -94,22 +89,20 @@ export default function ManageAbilityCardsInDeck({ id }: { id: string }) {
                                     role="combobox"
                                     aria-expanded={open}
                                     className="w-[200px] justify-between"
-                                    disabled={addCardToDeckMutation.isPending || deckAbilityCardsQuery.data?.length === 10 || CountBakugansQuery.data === 0  ? true : false}
+                                    disabled={addCardToDeckMutation.isPending || deckExclusiveAbilityCardsQuery.data?.length === 10 || CountBakugansQuery.data === 0 ? true : false}
                                 >
-                                    {notInDeckAbilitiesQuery?.data && value ? (
+                                    {notInDeckExclusiveAbilitiesQuery?.data && value ? (
                                         (() => {
-                                            const selectedBakugan = notInDeckAbilitiesQuery.data.find(
+                                            const selectedBakugan = notInDeckExclusiveAbilitiesQuery.data.find(
                                                 (b) => b.nom === value
                                             )
 
                                             if (!selectedBakugan) return "Select Ability Cards..."
 
-                                            const { nom, attributs } = selectedBakugan
-                                            const imageUrl = `/images/attribut/${attributs.toUpperCase()}.png`
+                                            const { nom } = selectedBakugan
 
                                             return (
                                                 <>
-                                                    <Image src={imageUrl} alt={`${attributs}`} width={20} height={20} />
                                                     {`${nom}`}
                                                 </>
                                             )
@@ -126,7 +119,7 @@ export default function ManageAbilityCardsInDeck({ id }: { id: string }) {
                                     <CommandList>
                                         <CommandEmpty>No card found.</CommandEmpty>
                                         <CommandGroup>
-                                            {notInDeckAbilitiesQuery?.data && notInDeckAbilitiesQuery?.data.map((b, index) => (
+                                            {notInDeckExclusiveAbilitiesQuery?.data && notInDeckExclusiveAbilitiesQuery?.data.map((b, index) => (
                                                 <CommandItem
                                                     key={index}
                                                     value={b.nom}
@@ -136,7 +129,6 @@ export default function ManageAbilityCardsInDeck({ id }: { id: string }) {
                                                         addCardToDeckMutation.mutate(b.id)
                                                     }}
                                                 >
-                                                    <Image src={`/images/attributs/${b.attributs.toUpperCase()}.png`} alt={b.nom} width={20} height={20} />
                                                     {b.nom}
                                                     <Check
                                                         className={cn(
@@ -153,17 +145,13 @@ export default function ManageAbilityCardsInDeck({ id }: { id: string }) {
                         </Popover>
                     </div>
                 </CardHeader>
-
-                <CardContent className={ deckAbilityCardsQuery.data && deckAbilityCardsQuery.data.length > 0 ? "grid grid-cols-1 md:grid-cols-2 gap-3" : ""}>
+                <CardContent className={ deckExclusiveAbilityCardsQuery.data && deckExclusiveAbilityCardsQuery.data.length > 0 ? "grid grid-cols-1 md:grid-cols-2 gap-3" : ""}>
                     {
-                        deckAbilityCardsQuery.data && deckAbilityCardsQuery.data.length > 0 ? deckAbilityCardsQuery.data.map((c, index) => <CardPreviewDeckEditor key={index} nom={c.abilityCard.nom} description={c.abilityCard.description} attribut={c.abilityCard.attributs} id={c.id} deckId={id}/>)
-
-                        : <p className='text-center'>No Ability Cards in the deck</p>
+                        deckExclusiveAbilityCardsQuery.data && deckExclusiveAbilityCardsQuery.data.length > 0 ? deckExclusiveAbilityCardsQuery.data.map((c, index) => <ExclusiveAbilityCardPreviewDeckEditor key={index} nom={c.exclusiveAbilityCards.nom} description={c.exclusiveAbilityCards.description} id={c.id} deckId={id} />)
+                            : <p className="text-center">No exclusive ability cards in this deck</p>
                     }
                 </CardContent>
-
             </Card>
-
         </>
     )
 }

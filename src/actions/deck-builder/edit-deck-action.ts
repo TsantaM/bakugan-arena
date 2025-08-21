@@ -76,6 +76,22 @@ export const RemoveBakuganInDeckAction = async ({ bakuganId, deckId }: { bakugan
             }
         })
 
+        await prisma.exclusiveAbilityCardDeck.deleteMany({
+            where: {
+                deckId: deckId,
+                exclusiveAbilityCards: {
+                    bakugan: {
+                        some:{
+                            id: bakuganId
+                        }
+                    }
+                },
+                deck: {
+                    userId: user.id
+                }
+            }
+        })
+
         const BakuganAttribut = await prisma.bakugan.findUnique({
             where: {
                 id: bakuganId
@@ -84,9 +100,6 @@ export const RemoveBakuganInDeckAction = async ({ bakuganId, deckId }: { bakugan
                 attribut: true
             }
         })
-
-
-        console.log(BakuganAttribut)
 
         const getBakuganInDeckWithSameAttribut = await prisma.deck.findFirst({
             where: {
@@ -104,9 +117,6 @@ export const RemoveBakuganInDeckAction = async ({ bakuganId, deckId }: { bakugan
                 }
             }
         })
-
-        console.log(getBakuganInDeckWithSameAttribut)
-
 
         if (getBakuganInDeckWithSameAttribut?.bakugans.length === 0) {
 
@@ -134,6 +144,52 @@ export const AddAbilityCardToDeck = async ({ cardId, deckId }: { cardId: string,
             data: {
                 deckId: deckId,
                 abilityCardId: cardId
+            }
+        })
+    }
+}
+
+export const RemoveAbilityCardFromDeck = async ({ cardId, deckId }: { cardId: string, deckId: string }) => {
+    const user = await getUser()
+
+    if (user) {
+        return prisma.abilityCardDeck.delete({
+            where: {
+                id: cardId,
+                deckId: deckId,
+                deck: {
+                    userId: user.id
+                }
+            }
+        })
+    }
+}
+
+export const AddExclusiveAbilityCardToDeck = async ({ cardId, deckId }: { cardId: string, deckId: string }) => {
+    const user = await getUser()
+
+    if(user) {
+        return prisma.exclusiveAbilityCardDeck.create({
+            data: {
+                deckId: deckId,
+                exclusiveAbilityCardsId: cardId
+            }
+        })
+    }
+
+}
+
+export const RemoveExclusiveAbilityCardFromDeck = async ({ cardId, deckId }: { cardId: string, deckId: string }) => {
+    const user = await getUser()
+
+    if(user) {
+        return prisma.exclusiveAbilityCardDeck.delete({
+            where: {
+                id: cardId,
+                deckId: deckId,
+                deck: {
+                    userId: user.id
+                }
             }
         })
     }

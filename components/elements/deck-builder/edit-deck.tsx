@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { GetDeckData, GetExclusiveCardsInDeck, GetGateCardsInDeck } from "@/src/actions/deck-builder/get-deck-data"
+import { GetDeckData, GetGateCardsInDeck } from "@/src/actions/deck-builder/get-deck-data"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { EditDeckNameSchema } from "./deck-builder-zod"
@@ -15,6 +15,7 @@ import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
 import ManageBakugansInDeck from "./edit-deck/manage-bakugans-in-deck"
 import ManageAbilityCardsInDeck from "./edit-deck/manage-ability-cards-in-deck"
+import ManageExclusiveAbilityCardsInDeck from "./edit-deck/manage-exclusive-ability-cards-in-deck"
 
 export type editDeckName_type = z.infer<typeof EditDeckNameSchema>
 
@@ -61,10 +62,6 @@ export default function EditDeck({ id }: { id: string }) {
 
     const onUpdateDeckName = (formData: editDeckName_type) => {
         updateNameMutation.mutate(formData)
-    }
-
-    const deckExclusiveAbilityCards = async () => {
-        return await GetExclusiveCardsInDeck(id)
     }
 
     const deckGateCards = async () => {
@@ -114,6 +111,8 @@ export default function EditDeck({ id }: { id: string }) {
                     <ManageBakugansInDeck id={id}/>
 
                     <ManageAbilityCardsInDeck id={id}/>
+
+                    <ManageExclusiveAbilityCardsInDeck id={id}/>
 
                 </CardContent>
 

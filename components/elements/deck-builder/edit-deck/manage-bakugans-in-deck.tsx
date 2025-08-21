@@ -62,6 +62,9 @@ export default function ManageBakugansInDeck({ id }: { id: string }) {
             deckBakugansQuery.refetch()
             queryClient.invalidateQueries({ queryKey: ['get-ability-cards-in-deck'] })
             queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-ability-cards'] })
+            queryClient.invalidateQueries({ queryKey: ['count-bakugans-in-deck'] })
+            queryClient.invalidateQueries({ queryKey: ['get-exclusive-ability-cards-in-deck'] })
+            queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-exclusive-ability-cards'] })
             toast.success('Bakugan added to deck successfully!')
             setValue('')
         },
@@ -121,7 +124,7 @@ export default function ManageBakugansInDeck({ id }: { id: string }) {
                                 <Command>
                                     <CommandInput placeholder="Search Bakugan..." className="h-9" />
                                     <CommandList>
-                                        <CommandEmpty>No framework found.</CommandEmpty>
+                                        <CommandEmpty>No bakugan found.</CommandEmpty>
                                         <CommandGroup>
                                             {notInDeckBakugansQuery?.data && notInDeckBakugansQuery?.data.map((b, index) => (
                                                 <CommandItem
