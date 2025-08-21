@@ -103,14 +103,42 @@ export const GetGateCardsInDeck = async(id: string) => {
                 deckId: id
             },
             select: {
+                id: true,
                 gateCards: {
                     select: {
                         id: true,
                         nom: true,
-                        description: true
+                        description: true,
+                        maxPerDeck: true,
                     }
                 }
             }
         })
     }
 }
+
+export const GetUserDecks = async() => {
+    const user = await getUser()
+
+    if(user) {
+        return await prisma.deck.findMany({
+            where: {
+                userId: user.id
+            },
+            select: {
+                id: true,
+                name: true,
+                bakugans: {
+                    select: {
+                        image: true,
+                        attribut: true,
+                        nom: true
+                    }
+                }
+            }
+        })
+    }
+}
+
+export type GetUserDecksType = Exclude<Awaited<ReturnType<typeof GetUserDecks>>, undefined>
+export type GetUserDecksElementType = Exclude<Awaited<ReturnType<typeof GetUserDecks>>,undefined>[number]

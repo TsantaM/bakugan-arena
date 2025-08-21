@@ -1,6 +1,4 @@
-import CreateDeckButton from "@/components/elements/deck-builder/create-deck-button";
-import { Card, CardHeader } from "@/components/ui/card";
-import Section from "@/components/ui/section";
+import DeckBuilerLanding from "@/components/elements/deck-builder/deck-builder-landing";
 import { getUser } from "@/src/actions/getUserSession";
 import { unauthorized } from "next/navigation";
 
@@ -13,16 +11,7 @@ export default async function DeckBuilerPage() {
 
     return (
         <>
-            <Section className="md:p-0">
-                <Card>
-                    <CardHeader>
-                        <div className="flex items-center justify-end gap-2">
-                            <CreateDeckButton />
-                        </div>
-                    </CardHeader>
-                </Card>
-            </Section>
-
+            <DeckBuilerLanding />
         </>
     )
 }

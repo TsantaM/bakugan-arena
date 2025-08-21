@@ -1,0 +1,191 @@
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Roles {
+  JOUEUR
+  ADMIN
+  GAMEDESIGNER
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+
+  role Roles @default(JOUEUR)
+
+  username        String?
+  displayUsername String?
+  Deck            Deck[]
+
+  @@unique([email])
+  @@unique([username])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+// Bakugans
+
+enum Attribut {
+  Pyrus
+  Ventus
+  Aquos
+  Subterra
+  Haos
+  Darkus
+}
+
+model Bakugan {
+  id                String   @id @default(uuid())
+  nom               String
+  attribut          Attribut
+  niveauDePuissance Int      @default(250)
+  image             String
+
+  ExclusivesAbilityCards ExclusivesAbilityCards[] @relation("exclusivesAbilities")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deckId    String?
+  Deck      Deck[]   @relation("deckBakugans")
+
+  @@unique([nom, attribut])
+}
+
+// Ability Card
+model AbilityCard {
+  id          String   @id @default(uuid())
+  nom         String   @unique
+  description String
+  maxPerDeck  Int      @default(3)
+  key         String
+  attributs   Attribut
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  AbilityCardDeck AbilityCardDeck[]
+}
+
+// Exclusive Avility Cards
+model ExclusivesAbilityCards {
+  id          String    @id @default(uuid())
+  nom         String    @unique
+  description String
+  maxPerDeck  Int       @default(3)
+  bakugan     Bakugan[] @relation("exclusivesAbilities")
+  key         String
+
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @updatedAt
+  ExclusiveAbilityCardDeck ExclusiveAbilityCardDeck[]
+}
+
+// Gate Card
+model GateCards {
+  id           String         @id @default(uuid())
+  nom          String         @unique
+  description  String
+  maxPerDeck   Int            @default(3)
+  key          String
+  deckId       String?
+  GateCardDeck GateCardDeck[]
+}
+
+model Deck {
+  id                       String                     @id @default(uuid())
+  name                     String
+  user                     User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                   String
+  bakugans                 Bakugan[]                  @relation("deckBakugans")
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @updatedAt
+  AbilityCardDeck          AbilityCardDeck[]
+  ExclusiveAbilityCardDeck ExclusiveAbilityCardDeck[]
+  GateCardDeck             GateCardDeck[]
+}
+
+model AbilityCardDeck {
+  id            String      @id @default(uuid())
+  abilityCard   AbilityCard @relation(fields: [abilityCardId], references: [id], onDelete: Cascade)
+  abilityCardId String
+  deck          Deck        @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  deckId        String
+}
+
+model ExclusiveAbilityCardDeck {
+  id                      String                 @id @default(uuid())
+  exclusiveAbilityCards   ExclusivesAbilityCards @relation(fields: [exclusiveAbilityCardsId], references: [id], onDelete: Cascade)
+  exclusiveAbilityCardsId String
+  deck                    Deck                   @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  deckId                  String
+}
+
+model GateCardDeck {
+  id          String    @id @default(uuid())
+  gateCards   GateCards @relation(fields: [gateCardsId], references: [id], onDelete: Cascade)
+  gateCardsId String
+  deck        Deck      @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  deckId      String
+}

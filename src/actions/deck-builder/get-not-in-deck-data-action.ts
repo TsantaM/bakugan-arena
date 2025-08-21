@@ -2,7 +2,7 @@
 
 import prisma from "@/src/lib/prisma"
 import { getUser } from "../getUserSession"
-import { GetBakugansInDeck, GetExclusiveCardsInDeck } from "./get-deck-data"
+import { GetBakugansInDeck, GetExclusiveCardsInDeck, GetGateCardsInDeck } from "./get-deck-data"
 
 export const GetNotInDeckBakugans = async ({ id }: { id: string }) => {
     const user = await getUser()
@@ -125,4 +125,24 @@ export const GetNotInDeckExclusiveAbilityCards = async ({ id }: { id: string }) 
 
         return exclusivesNotInDeck
     }
+}
+
+export const GetNotInDeckGateCards = async ({ id }: { id: string }) => {
+
+    const user = await getUser()
+
+    if (user) {
+        const gateInDeck = await GetGateCardsInDeck(id)
+
+        const gates = await prisma.gateCards.findMany()
+
+        const gatesNotInDeck = gates.filter((card) => {
+            const countInDeck = gateInDeck ? gateInDeck?.filter((c) => c.gateCards.id === card.id).length : 0
+            return countInDeck < card.maxPerDeck
+        })
+
+
+        return gatesNotInDeck
+    }
+
 }
