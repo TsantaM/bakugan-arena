@@ -22,14 +22,15 @@ import { useQuery } from "@tanstack/react-query"
 import Image from "next/image"
 import Link from "next/link"
 import { authClient } from "@/src/lib/auth-client"
+import UseSearchOpponent from "@/src/sockets/search-opponent"
 
 
 export default function Lobby() {
 
+    const { emitPlayerData, waitingOpponent } = UseSearchOpponent()
     const [value, setValue] = useState('')
     const [open, setOpen] = useState(false)
     const user = authClient.useSession()
-    const id =  user.data ? user.data?.user.id : ''
 
     const getUserDecks = async () => {
         return await GetUserDecks()
@@ -41,6 +42,18 @@ export default function Lobby() {
         refetchOnWindowFocus: false,
         refetchOnMount: false,
     })
+
+    const onSearchOpponent = () => {
+        if (value && value !== '') {
+
+            if (user.data && user.data?.user.id) {
+                const userId = user.data.user.id
+                emitPlayerData({ userId, deckId: value })
+                console.log(value, userId)
+            }
+
+        }
+    }
 
     return (
         <>
@@ -128,7 +141,7 @@ export default function Lobby() {
                 </CardContent>
 
                 <CardFooter className="flex">
-                    <Button disabled={!value || value === '' ? true : false } className="w-full text-xl font-bold" onClick={() => alert(`Deck Id : ${value}, user Id : ${id}`)}>{!value || value === '' ? 'Chose a deck' : 'Start Battle !' }</Button>
+                    <Button disabled={!value || value === '' || waitingOpponent ? true : false} className="w-full text-xl font-bold" onClick={onSearchOpponent}>{waitingOpponent ? 'Waiting opponent ...' : !value || value === '' ? 'Chose a deck' : 'Start Battle !'}</Button>
                 </CardFooter>
             </Card>
 
