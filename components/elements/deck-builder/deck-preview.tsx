@@ -4,20 +4,23 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Toaster } from "@/components/ui/sonner"
 import { DeleteDeck } from "@/src/actions/deck-builder/delete-deck"
-import { GetUserDecksElementType } from "@/src/actions/deck-builder/get-deck-data"
+import { GetUserDeckType } from "@/src/actions/deck-builder/get-deck-data"
+import { BakuganList } from "@/src/game-data/battle-brawlers/bakugans"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Edit, Trash } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { toast } from "sonner"
 
-export default function DeckPreview( {data} : {data: GetUserDecksElementType}) {
+export default function DeckPreview( {data} : {data: GetUserDeckType}) {
 
     const queryClient = useQueryClient()
 
     const deleteDeckFunction = async() => {
         return await DeleteDeck(data.id)
     }
+
+    const bakugans = BakuganList.filter((b) => data.bakugans.includes(b.key))
 
     const deleteDeckMutation = useMutation({
         mutationKey: ['delete-deck'],
@@ -45,7 +48,7 @@ export default function DeckPreview( {data} : {data: GetUserDecksElementType}) {
                 </div>
             </CardHeader>
             <CardContent className="flex items-center gap-3">
-                { data.bakugans.length > 0 ? data.bakugans.map((b, index) => <Image key={index} alt={`${b.nom} ${b.attribut}`} src={`/images/bakugans/sphere/${b.image}/${b.attribut.toUpperCase()}.png`} width={50} height={50}/>) : 'No bakugan in this deck'}
+                { bakugans.length > 0 ? bakugans.map((b, index) => <Image key={index} alt={`${b.name} ${b.attribut}`} src={`/images/bakugans/sphere/${b.image}/${b.attribut.toUpperCase()}.png`} width={50} height={50}/>) : 'No bakugan in this deck'}
             </CardContent>
             <Toaster/>
         </Card>
