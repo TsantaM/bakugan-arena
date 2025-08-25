@@ -1,8 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { GetAbilityCardsInDeck, GetBakugansInDeck } from "@/src/actions/deck-builder/get-deck-data"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -21,50 +20,35 @@ import {
 } from "@/components/ui/popover"
 import Image from "next/image"
 import { useState } from "react"
-import { GetNotInDeckAbilityCards } from "@/src/actions/deck-builder/get-not-in-deck-data-action"
 import { AddAbilityCardToDeck } from "@/src/actions/deck-builder/edit-deck-action"
 import { toast } from "sonner"
 import CardPreviewDeckEditor from "./cards-preview-deck-editor"
+import { AbilityCardsList } from "@/src/game-data/battle-brawlers/ability-cards"
+import { BakuganList } from "@/src/game-data/battle-brawlers/bakugans"
 
 
-export default function ManageAbilityCardsInDeck({ id }: { id: string }) {
+export default function ManageAbilityCardsInDeck({ deckId, abilityCards, countBakugans, bakugans }: { deckId: string, abilityCards: string[] | undefined, countBakugans: number, bakugans: string[] }) {
 
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState("")
     const queryClient = useQueryClient()
 
-    const countBakugans = async() => {
-        const list = await GetBakugansInDeck(id)
-        const count = list && list.bakugans.length
-        return count
-    }
+    // Récupère l'attribut des bakugans dans l'équite
+    const bakugansAttribut = [... new Set(BakuganList.filter((b) => bakugans.includes(b.key)).map((b) => b.attribut))]
+    console.log(abilityCards)
 
-    const CountBakugansQuery = useQuery({
-        queryKey: ['count-bakugans-in-deck'],
-        queryFn: countBakugans
-    })
+    const deckAbilityCards = AbilityCardsList.filter((c) => abilityCards?.includes(c.key))
+    const deckCards = abilityCards ? abilityCards?.map((c) => AbilityCardsList.find(card => card.key === c)) : []
 
 
-    const deckAbilityCards = async () => {
-        return await GetAbilityCardsInDeck(id)
-    }
+    const notInDeckAbilities = AbilityCardsList.filter((c) => bakugansAttribut.includes(c.attribut)).filter((c) => {
+        const exemplary = deckCards.filter((a) => a?.key === c.key).length
 
-    const deckAbilityCardsQuery = useQuery({
-        queryKey: ['get-ability-cards-in-deck'],
-        queryFn: deckAbilityCards
-    })
-
-    const notInDeckAbilities = async () => {
-        return await GetNotInDeckAbilityCards({ id })
-    }
-
-    const notInDeckAbilitiesQuery = useQuery({
-        queryKey: ['get-not-in-deck-ability-cards'],
-        queryFn: notInDeckAbilities
+        return c.maxInDeck > exemplary
     })
 
     const addCardToDeck = async (cardId: string) => {
-        return await AddAbilityCardToDeck({ cardId, deckId: id })
+        return await AddAbilityCardToDeck({ cardId, deckId })
     }
 
     const addCardToDeckMutation = useMutation({
@@ -72,8 +56,7 @@ export default function ManageAbilityCardsInDeck({ id }: { id: string }) {
         mutationFn: addCardToDeck,
         onSuccess: () => {
             toast.success("Ability card has been added to deck")
-            queryClient.invalidateQueries({ queryKey: ['get-ability-cards-in-deck'] })
-            queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-ability-cards'] })
+            queryClient.invalidateQueries({ queryKey: ['get-deck-data'] })
             setValue('')
         }
     })
@@ -87,78 +70,81 @@ export default function ManageAbilityCardsInDeck({ id }: { id: string }) {
                         <CardTitle>
                             Ability Cards
                         </CardTitle>
-                        <Popover open={open} onOpenChange={setOpen}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    role="combobox"
-                                    aria-expanded={open}
-                                    className="w-[200px] justify-between"
-                                    disabled={addCardToDeckMutation.isPending || deckAbilityCardsQuery.data?.length === 10 || CountBakugansQuery.data === 0  ? true : false}
-                                >
-                                    {notInDeckAbilitiesQuery?.data && value ? (
-                                        (() => {
-                                            const selectedBakugan = notInDeckAbilitiesQuery.data.find(
-                                                (b) => b.nom === value
-                                            )
+                        <div className="flex items-center gap-3">
+                            <p>{abilityCards ? abilityCards?.length : 0} / 6</p>
+                            <Popover open={open} onOpenChange={setOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        aria-expanded={open}
+                                        className="w-[200px] lg:w-[300px] justify-between"
+                                        disabled={addCardToDeckMutation.isPending || abilityCards?.length === 6 || countBakugans === 0 ? true : false}
+                                    >
+                                        {notInDeckAbilities && value ? (
+                                            (() => {
+                                                const selectedCard = notInDeckAbilities.find(
+                                                    (b) => b.name === value
+                                                )
 
-                                            if (!selectedBakugan) return "Select Ability Cards..."
+                                                if (!selectedCard) return "Select Ability Cards..."
 
-                                            const { nom, attributs } = selectedBakugan
-                                            const imageUrl = `/images/attribut/${attributs.toUpperCase()}.png`
+                                                const { name, attribut } = selectedCard
+                                                const imageUrl = `/images/attribut/${attribut.toUpperCase()}.png`
 
-                                            return (
-                                                <>
-                                                    <Image src={imageUrl} alt={`${attributs}`} width={20} height={20} />
-                                                    {`${nom}`}
-                                                </>
-                                            )
-                                        })()
-                                    ) : (
-                                        "Select Ability Card..."
-                                    )}
-                                    <ChevronsUpDown className="opacity-50" />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[200px] p-0">
-                                <Command>
-                                    <CommandInput placeholder="Search Bakugan..." className="h-9" />
-                                    <CommandList>
-                                        <CommandEmpty>No card found.</CommandEmpty>
-                                        <CommandGroup>
-                                            {notInDeckAbilitiesQuery?.data && notInDeckAbilitiesQuery?.data.map((b, index) => (
-                                                <CommandItem
-                                                    key={index}
-                                                    value={b.nom}
-                                                    onSelect={(currentValue) => {
-                                                        setValue(currentValue === value ? "" : currentValue)
-                                                        setOpen(false)
-                                                        addCardToDeckMutation.mutate(b.id)
-                                                    }}
-                                                >
-                                                    <Image src={`/images/attributs/${b.attributs.toUpperCase()}.png`} alt={b.nom} width={20} height={20} />
-                                                    {b.nom}
-                                                    <Check
-                                                        className={cn(
-                                                            "ml-auto",
-                                                            value === b.id ? "opacity-100" : "opacity-0"
-                                                        )}
-                                                    />
-                                                </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                    </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
+                                                return (
+                                                    <>
+                                                        <Image src={imageUrl} alt={`${attribut}`} width={20} height={20} />
+                                                        {`${name}`}
+                                                    </>
+                                                )
+                                            })()
+                                        ) : (
+                                            "Select Ability Card..."
+                                        )}
+                                        <ChevronsUpDown className="opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[200px] lg:w-[300px] p-0">
+                                    <Command>
+                                        <CommandInput placeholder="Search Ability Card..." className="h-9" />
+                                        <CommandList>
+                                            <CommandEmpty>No card found.</CommandEmpty>
+                                            <CommandGroup>
+                                                {notInDeckAbilities.map((b, index) => (
+                                                    <CommandItem
+                                                        key={index}
+                                                        value={b.name}
+                                                        onSelect={(currentValue) => {
+                                                            setValue(currentValue === value ? "" : currentValue)
+                                                            setOpen(false)
+                                                            addCardToDeckMutation.mutate(b.key)
+                                                        }}
+                                                    >
+                                                        <Image src={`/images/attributs/${b.attribut.toUpperCase()}.png`} alt={b.attribut} width={20} height={20} />
+                                                        {b.name}
+                                                        <Check
+                                                            className={cn(
+                                                                "ml-auto",
+                                                                value === b.key ? "opacity-100" : "opacity-0"
+                                                            )}
+                                                        />
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
                     </div>
                 </CardHeader>
 
-                <CardContent className={ deckAbilityCardsQuery.data && deckAbilityCardsQuery.data.length > 0 ? "grid grid-cols-1 md:grid-cols-2 gap-3" : ""}>
+                <CardContent className={deckAbilityCards.length > 0 ? "grid grid-cols-1 md:grid-cols-2 gap-3" : ""}>
                     {
-                        deckAbilityCardsQuery.data && deckAbilityCardsQuery.data.length > 0 ? deckAbilityCardsQuery.data.map((c, index) => <CardPreviewDeckEditor key={index} nom={c.abilityCard.nom} description={c.abilityCard.description} attribut={c.abilityCard.attributs} id={c.id} deckId={id}/>)
+                        deckCards.length > 0 ? deckCards.map((c, index) => <CardPreviewDeckEditor key={index} nom={c ? c.name : ''} description={c ? c.description : ''} attribut={c && c.attribut} id={c ? c.key : ''} deckId={deckId} />)
 
-                        : <p className='text-center'>No Ability Cards in the deck</p>
+                            : <p className='text-center'>No Ability Cards in the deck</p>
                     }
                 </CardContent>
 

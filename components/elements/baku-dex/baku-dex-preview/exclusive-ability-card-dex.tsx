@@ -1,9 +1,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { bakuganType } from "@/src/types/game-data-types";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function ExclusiveAbilityCardDexPreview({ nom, description, max, attribut, bakugan }: { nom: string, description: string, max: number, attribut?: string, bakugan?: { nom: string, attribut: string, id: string }[] }) {
+export default function ExclusiveAbilityCardDexPreview({ nom, description, max, attribut, bakugan }: { nom: string, description: string, max: number, attribut?: string, bakugan?: bakuganType[]}) {
     return (
         <Card>
             <CardHeader>
@@ -23,7 +24,7 @@ export default function ExclusiveAbilityCardDexPreview({ nom, description, max, 
 
                 <div className="flex w-full flex-wrap gap-2">
                     {
-                        bakugan && bakugan.map((b, index) => <Link key={index} href={`/baku-dex/bakugan?id=${b.id}`}><Badge variant="outline">{`${b.nom} ${b.attribut}`}</Badge></Link>)
+                        bakugan && bakugan.map((b, index) => <Link key={index} href={`/baku-dex/bakugan?id=${b.key}`}><Badge variant="outline">{`${b.name} ${b.attribut}`}</Badge></Link>)
                     }
 
                 </div>

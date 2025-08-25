@@ -1,16 +1,16 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { GetBakugansDataType } from "@/src/actions/dex/get-bakugan-data";
 import Link from "next/link";
 import BakuganPreview from "../preview/bakugan-preview";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { BakuganList } from "@/src/game-data/battle-brawlers/bakugans";
 
-export default function BakuDex({ data }: { data: GetBakugansDataType[] }) {
+export default function BakuDex() {
 
     const [search, setSearch] = useState('')
-    const filtered = data.filter((d) => d.nom.toLowerCase().includes(search.toLowerCase()))
+    const filtered = BakuganList.filter((d) => d.name.toLowerCase().includes(search.toLowerCase()))
 
         return (
             <Card>
@@ -26,7 +26,7 @@ export default function BakuDex({ data }: { data: GetBakugansDataType[] }) {
                     filtered.length > 0 ? <CardContent className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                         {
                             filtered.map((d, index) =>
-                                <Link key={index} href={`/baku-dex/bakugan?id=${d.id}`}>
+                                <Link key={index} href={`/baku-dex/bakugan?id=${d.key}`}>
                                     <BakuganPreview data={d} />
                                 </Link>
                             )

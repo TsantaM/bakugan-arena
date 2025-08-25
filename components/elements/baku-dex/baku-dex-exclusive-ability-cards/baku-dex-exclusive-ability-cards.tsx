@@ -2,15 +2,16 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { GetExclusiveAbilityCardsDataType } from "@/src/actions/dex/get-exclusive-ability-cards";
 import ExclusiveAbilityCardDexPreview from "../baku-dex-preview/exclusive-ability-card-dex";
 import { useState } from "react";
+import { ExclusiveAbilitiesList } from "@/src/game-data/battle-brawlers/exclusive-abilities";
+import { BakuganList } from "@/src/game-data/battle-brawlers/bakugans";
 
-export default function BakuDexExclusiveAbilityCards({ data }: { data: GetExclusiveAbilityCardsDataType[] }) {
+export default function BakuDexExclusiveAbilityCards() {
 
 
     const [search, setSearch] = useState('')
-    const filtered = data.filter((d) => d.nom.toLowerCase().includes(search.toLowerCase()))
+    const filtered = ExclusiveAbilitiesList.filter((d) => d.name.toLowerCase().includes(search.toLowerCase()))
 
     return (
         <Card>
@@ -26,7 +27,10 @@ export default function BakuDexExclusiveAbilityCards({ data }: { data: GetExclus
 
             <CardContent className={`${filtered.length > 0 && 'grid grid-cols-1 lg:grid-cols-3 gap-3'}`}>
                 {
-                    filtered.length > 0 ? filtered.map((c, index) => <ExclusiveAbilityCardDexPreview key={index} nom={c.nom} description={c.description} max={c.maxPerDeck} bakugan={c.bakugan}/>) : <p className="text-center">No result</p>
+                    filtered.length > 0 ? filtered.map((c, index) => {
+                        const compatibles = BakuganList.filter((b) => b.exclusiveAbilities.includes(c.key))
+                    return <ExclusiveAbilityCardDexPreview key={index} nom={c.name} description={c.description} max={c.maxInDeck} bakugan={compatibles} />
+                }) : <p className="text-center">No result</p>
                 }
             </CardContent>
 

@@ -86,106 +86,15 @@ model Verification {
   @@map("verification")
 }
 
-// Bakugans
-
-enum Attribut {
-  Pyrus
-  Ventus
-  Aquos
-  Subterra
-  Haos
-  Darkus
-}
-
-model Bakugan {
-  id                String   @id @default(uuid())
-  nom               String
-  attribut          Attribut
-  niveauDePuissance Int      @default(250)
-  image             String
-
-  ExclusivesAbilityCards ExclusivesAbilityCards[] @relation("exclusivesAbilities")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deckId    String?
-  Deck      Deck[]   @relation("deckBakugans")
-
-  @@unique([nom, attribut])
-}
-
-// Ability Card
-model AbilityCard {
-  id          String   @id @default(uuid())
-  nom         String   @unique
-  description String
-  maxPerDeck  Int      @default(3)
-  key         String
-  attributs   Attribut
-
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  AbilityCardDeck AbilityCardDeck[]
-}
-
-// Exclusive Avility Cards
-model ExclusivesAbilityCards {
-  id          String    @id @default(uuid())
-  nom         String    @unique
-  description String
-  maxPerDeck  Int       @default(3)
-  bakugan     Bakugan[] @relation("exclusivesAbilities")
-  key         String
-
-  createdAt                DateTime                   @default(now())
-  updatedAt                DateTime                   @updatedAt
-  ExclusiveAbilityCardDeck ExclusiveAbilityCardDeck[]
-}
-
-// Gate Card
-model GateCards {
-  id           String         @id @default(uuid())
-  nom          String         @unique
-  description  String
-  maxPerDeck   Int            @default(3)
-  key          String
-  deckId       String?
-  GateCardDeck GateCardDeck[]
-}
-
 model Deck {
-  id                       String                     @id @default(uuid())
-  name                     String
-  user                     User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId                   String
-  bakugans                 Bakugan[]                  @relation("deckBakugans")
-  createdAt                DateTime                   @default(now())
-  updatedAt                DateTime                   @updatedAt
-  AbilityCardDeck          AbilityCardDeck[]
-  ExclusiveAbilityCardDeck ExclusiveAbilityCardDeck[]
-  GateCardDeck             GateCardDeck[]
-}
-
-model AbilityCardDeck {
-  id            String      @id @default(uuid())
-  abilityCard   AbilityCard @relation(fields: [abilityCardId], references: [id], onDelete: Cascade)
-  abilityCardId String
-  deck          Deck        @relation(fields: [deckId], references: [id], onDelete: Cascade)
-  deckId        String
-}
-
-model ExclusiveAbilityCardDeck {
-  id                      String                 @id @default(uuid())
-  exclusiveAbilityCards   ExclusivesAbilityCards @relation(fields: [exclusiveAbilityCardsId], references: [id], onDelete: Cascade)
-  exclusiveAbilityCardsId String
-  deck                    Deck                   @relation(fields: [deckId], references: [id], onDelete: Cascade)
-  deckId                  String
-}
-
-model GateCardDeck {
-  id          String    @id @default(uuid())
-  gateCards   GateCards @relation(fields: [gateCardsId], references: [id], onDelete: Cascade)
-  gateCardsId String
-  deck        Deck      @relation(fields: [deckId], references: [id], onDelete: Cascade)
-  deckId      String
+  id                 String   @id @default(uuid())
+  name               String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId             String
+  bakugans           String[]
+  ability            String[]
+  exclusiveAbilities String[]
+  gateCards          String[]
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }

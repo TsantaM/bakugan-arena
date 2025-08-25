@@ -1,9 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BakuganDexDataType } from "@/src/actions/dex/get-bakugan-data";
 import Image from "next/image";
 import ExclusiveAbilityCardDexPreview from "../baku-dex-preview/exclusive-ability-card-dex";
+import { bakuganType } from "@/src/types/game-data-types";
+import { BakuganList } from "@/src/game-data/battle-brawlers/bakugans";
+import { ExclusiveAbilitiesList } from "@/src/game-data/battle-brawlers/exclusive-abilities";
+import { AbilityCardsList } from "@/src/game-data/battle-brawlers/ability-cards";
 
-export default function BakuganDex({ data }: { data: BakuganDexDataType }) {
+export default function BakuganDex({ data }: { data: bakuganType }) {
+
+    const bakugan = BakuganList.find((b) => b.key === data.key)
+    const exclusiveAbilities = ExclusiveAbilitiesList.filter((c) => bakugan?.exclusiveAbilities.includes(c.key))
+    const abilityCards = AbilityCardsList.filter((c) => bakugan?.attribut === c.attribut)
+
     return (
         <>
             <Card>
@@ -12,15 +20,15 @@ export default function BakuganDex({ data }: { data: BakuganDexDataType }) {
                         <CardContent>
                             <div className="w-full lg:w-[50%] flex gap-5">
                                 <div className="relative size-32">
-                                    <Image src={`/images/bakugans/sphere/${data.bakugan?.nom}/${data.bakugan?.attribut.toUpperCase()}.png`} alt={`${data.bakugan?.nom} ${data.bakugan?.attribut}`} fill />
+                                    <Image src={`/images/bakugans/sphere/${bakugan?.name}/${bakugan?.attribut.toUpperCase()}.png`} alt={`${bakugan?.name} ${bakugan?.attribut}`} fill />
                                 </div>
                                 <div className="flex flex-col gap-3">
                                     <CardTitle>
-                                        {data.bakugan?.nom} {data.bakugan?.attribut}
+                                        {bakugan?.name} {bakugan?.attribut}
                                     </CardTitle>
                                     <ul className="flex flex-col gap-1">
-                                        <li className="relative size-10"><Image src={`/images/attributs/${data.bakugan?.attribut.toUpperCase()}.png`} alt={data.bakugan?.attribut ? data.bakugan?.attribut : ''} fill /></li>
-                                        <li><span className='text-bold text-sm'>Power Level : </span><span className="text-sm">{data.bakugan?.niveauDePuissance} G</span></li>
+                                        <li className="relative size-10"><Image src={`/images/attributs/${bakugan?.attribut.toUpperCase()}.png`} alt={bakugan?.attribut ? bakugan?.attribut : ''} fill /></li>
+                                        <li><span className='text-bold text-sm'>Power Level : </span><span className="text-sm">{bakugan?.powerLevel} G</span></li>
                                     </ul>
                                 </div>
                             </div>
@@ -36,7 +44,7 @@ export default function BakuganDex({ data }: { data: BakuganDexDataType }) {
                         </CardHeader>
                         <CardContent>
                             {
-                                data.bakugan?.ExclusivesAbilityCards.map((c, index) => <ExclusiveAbilityCardDexPreview key={index} nom={c.nom} description={c.description} max={c.maxPerDeck} />)
+                                exclusiveAbilities.map((c, index) => <ExclusiveAbilityCardDexPreview key={index} nom={c.name} description={c.description} max={c.maxInDeck} />)
                             }
                         </CardContent>
                     </Card>
@@ -49,7 +57,7 @@ export default function BakuganDex({ data }: { data: BakuganDexDataType }) {
                         </CardHeader>
                         <CardContent>
                             {
-                                data.abilities?.map((c, index) => <ExclusiveAbilityCardDexPreview key={index} nom={c.nom} description={c.description} max={c.maxPerDeck} attribut={c.attributs} />)
+                                abilityCards.map((c, index) => <ExclusiveAbilityCardDexPreview key={index} nom={c.name} description={c.description} max={c.maxInDeck} attribut={c.attribut} />)
                             }
                         </CardContent>
                     </Card>

@@ -1,0 +1,15 @@
+import { gateCardType } from "@/src/types/game-data-types";
+
+export const MineFantome: gateCardType = {
+    key: 'mine-fantome',
+    name: 'Mine Fantôme',
+    maxInDeck: 1,
+    description: `Lorsque deux Bakugans se retrouvent sur cette carte ils sont tous les deux éliminés peu importe à qui ils appartiennent`
+}
+
+export const Echange: gateCardType = {
+    key: 'echange',
+    name: 'Echange',
+    maxInDeck: 1,
+    description: `Tout Bakugan ayant un niveau de puissance supérieur à 450 G perd automatiquement`
+}

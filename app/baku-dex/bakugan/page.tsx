@@ -1,16 +1,17 @@
 import BakuganDex from "@/components/elements/baku-dex/bakugan-dex-page/bakugan-dex-page";
-import { BakuganDexData } from "@/src/actions/dex/get-bakugan-data";
+import { BakuganList } from "@/src/game-data/battle-brawlers/bakugans";
 
 export default async function BakuDexPage({ searchParams }: { searchParams: { id: string } }) {
     const id = searchParams.id
-    const data = await BakuganDexData(id)
+    const data = BakuganList.find((b) => b.key === id)
 
-    return (
-        <>
-        
-        <BakuganDex data={data}/>
-        
-        
-        </>
-    )
+    if (data) {
+        return (
+            <>
+
+                <BakuganDex data={data} />
+
+            </>
+        )
+    }
 }

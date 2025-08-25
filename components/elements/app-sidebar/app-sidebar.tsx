@@ -75,19 +75,6 @@ export default function AppSidebar({ role }: { role: RoleType | undefined }) {
                         }
 
                         {
-                            role?.role === 'GAMEDESIGNER' && <SidebarMenu>
-                                <SidebarMenuItem>
-                                    <SidebarMenuButton asChild>
-                                        <Link href={'/dashboard/game-designer'}>
-                                            <KeyRound />
-                                            <span>Game Designer</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            </SidebarMenu>
-                        }
-
-                        {
                             role?.role === 'ADMIN' && <SidebarMenu>
                                 <SidebarMenuItem>
                                     <SidebarMenuButton asChild>

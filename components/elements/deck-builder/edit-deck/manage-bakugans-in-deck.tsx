@@ -1,8 +1,6 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { GetBakugansInDeck } from "@/src/actions/deck-builder/get-deck-data"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Check, ChevronsUpDown } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -21,60 +19,43 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { useState } from "react"
-import { GetNotInDeckBakugans } from "@/src/actions/deck-builder/get-not-in-deck-data-action"
 import Image from "next/image"
-import { AddBakuganInDeckAction } from "@/src/actions/deck-builder/edit-deck-action"
-import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
+import { BakuganList } from "@/src/game-data/battle-brawlers/bakugans"
 import BakuganPreviewDeckEditor from "./bakugan-preview-deck-editor"
+import { AddBakuganToDeckAction } from "@/src/actions/deck-builder/edit-deck-action"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
 
-export default function ManageBakugansInDeck({ id }: { id: string }) {
+export default function ManageBakugansInDeck({ deckId, bakugans }: { deckId: string, bakugans: string[] | undefined }) {
 
     const queryClient = useQueryClient()
+    const [open, setOpen] = useState(false)
+    const [value, setValue] = useState("")
 
-    const deckBakugans = async () => {
-        return await GetBakugansInDeck(id)
-    }
+    const bakugansInDeck = BakuganList.filter((b) => bakugans?.includes(b.key))
+    const bakuganInDeckFamilies = bakugansInDeck.map((b) => b.family)
+    const notInDeckBakugans = BakuganList.filter((b) => !bakuganInDeckFamilies.includes(b.family))
 
-    const deckBakugansQuery = useQuery({
-        queryKey: ['get-bakugans-in-deck'],
-        queryFn: deckBakugans
-    })
-
-    const notInDeckBakugans = async () => {
-        return await GetNotInDeckBakugans({ id })
-    }
-
-    const notInDeckBakugansQuery = useQuery({
-        queryKey: ['not-in-deck-bakugans'],
-        queryFn: notInDeckBakugans
-    })
+    console.log(notInDeckBakugans)
 
     const addBakuganToDeck = async (bakuganId: string) => {
-        return await AddBakuganInDeckAction({ bakuganId, deckId: id })
+        console.log(bakuganId)
+        await AddBakuganToDeckAction({ bakuganId, deckId })
     }
 
     const addBakuganToDeckMutation = useMutation({
         mutationKey: ['add-bakugan-to-deck'],
         mutationFn: addBakuganToDeck,
         onSuccess: () => {
-            notInDeckBakugansQuery.refetch()
-            deckBakugansQuery.refetch()
-            queryClient.invalidateQueries({ queryKey: ['get-ability-cards-in-deck'] })
-            queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-ability-cards'] })
-            queryClient.invalidateQueries({ queryKey: ['count-bakugans-in-deck'] })
-            queryClient.invalidateQueries({ queryKey: ['get-exclusive-ability-cards-in-deck'] })
-            queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-exclusive-ability-cards'] })
-            toast.success('Bakugan added to deck successfully!')
+            toast.success("Bakugan has been added to deck")
+            queryClient.invalidateQueries({ queryKey: ['get-deck-data'] })
             setValue('')
         },
         onError: (err) => {
-            console.error("Error adding Bakugan to deck:", err)
+            console.log(err)
         }
     })
-
-    const [open, setOpen] = useState(false)
-    const [value, setValue] = useState("")
 
     return (
 
@@ -86,79 +67,80 @@ export default function ManageBakugansInDeck({ id }: { id: string }) {
                         <CardTitle>
                             Bakugans
                         </CardTitle>
+                        <div className='flex items-center gap-3'>
+                            <p>{bakugans ? bakugans.length : 0} / 3</p>
+                            <Popover open={open} onOpenChange={setOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        aria-expanded={open}
+                                        className="w-[200px] lg:w-[300px] justify-between"
+                                        disabled={addBakuganToDeckMutation.isPending || bakugans?.length === 3 ? true : false}
+                                    >
+                                        {value ? (
+                                            (() => {
+                                                const selectedBakugan = BakuganList.find(
+                                                    (b) => `${b.name} ${b.attribut}` === value
+                                                )
 
-                        <Popover open={open} onOpenChange={setOpen}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    role="combobox"
-                                    aria-expanded={open}
-                                    className="w-[200px] justify-between"
-                                    disabled={addBakuganToDeckMutation.isPending || deckBakugansQuery.data?.bakugans.length === 3 ? true : false}
-                                >
-                                    {notInDeckBakugansQuery?.data && value ? (
-                                        (() => {
-                                            const selectedBakugan = notInDeckBakugansQuery.data.find(
-                                                (b) => `${b.nom} ${b.attribut}` === value
-                                            )
+                                                if (!selectedBakugan) return "Select Bakugan..."
 
-                                            if (!selectedBakugan) return "Select Bakugan..."
+                                                const { name, attribut, image } = selectedBakugan
+                                                const imageUrl = `/images/bakugans/sphere/${image}/${attribut.toUpperCase()}.png`
 
-                                            const { nom, attribut, image } = selectedBakugan
-                                            const imageUrl = `/images/bakugans/sphere/${image}/${attribut.toUpperCase()}.png`
+                                                return (
+                                                    <>
+                                                        <Image src={imageUrl} alt={`${name} ${attribut}`} width={20} height={20} />
+                                                        {`${name} ${attribut}`}
+                                                    </>
+                                                )
+                                            })()
+                                        ) : (
+                                            "Select Bakugan..."
+                                        )}
+                                        <ChevronsUpDown className="opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[200px] lg:w-[300px] p-0">
+                                    <Command>
+                                        <CommandInput placeholder="Search Bakugan..." className="h-9" />
+                                        <CommandList>
+                                            <CommandEmpty>No bakugan found.</CommandEmpty>
+                                            <CommandGroup>
+                                                {notInDeckBakugans.map((b, index) => (
+                                                    <CommandItem
+                                                        key={index}
+                                                        value={`${b.name} ${b.attribut}`}
+                                                        onSelect={(currentValue) => {
+                                                            setValue(currentValue === value ? "" : currentValue)
+                                                            setOpen(false)
+                                                            addBakuganToDeckMutation.mutate(b.key)
+                                                        }}
+                                                    >
+                                                        <Image src={`/images/bakugans/sphere/${b.image}/${b.attribut.toUpperCase()}.png`} alt={`${b.name} ${b.attribut}`} width={20} height={20} />
+                                                        {`${b.name} ${b.attribut}`}
+                                                        <Check
+                                                            className={cn(
+                                                                "ml-auto",
+                                                                value === b.key ? "opacity-100" : "opacity-0"
+                                                            )}
+                                                        />
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
 
-                                            return (
-                                                <>
-                                                    <Image src={imageUrl} alt={`${nom} ${attribut}`} width={20} height={20} />
-                                                    {`${nom} ${attribut}`}
-                                                </>
-                                            )
-                                        })()
-                                    ) : (
-                                        "Select Bakugan..."
-                                    )}
-                                    <ChevronsUpDown className="opacity-50" />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[200px] p-0">
-                                <Command>
-                                    <CommandInput placeholder="Search Bakugan..." className="h-9" />
-                                    <CommandList>
-                                        <CommandEmpty>No bakugan found.</CommandEmpty>
-                                        <CommandGroup>
-                                            {notInDeckBakugansQuery?.data && notInDeckBakugansQuery?.data.map((b, index) => (
-                                                <CommandItem
-                                                    key={index}
-                                                    value={`${b.nom} ${b.attribut}`}
-                                                    onSelect={(currentValue) => {
-                                                        setValue(currentValue === value ? "" : currentValue)
-                                                        setOpen(false)
-                                                        addBakuganToDeckMutation.mutate(b.id)
-                                                    }}
-                                                >
-                                                    <Image src={`/images/bakugans/sphere/${b.image}/${b.attribut.toUpperCase()}.png`} alt={`${b.nom} ${b.attribut}`} width={20} height={20} />
-                                                    {`${b.nom} ${b.attribut}`}
-                                                    <Check
-                                                        className={cn(
-                                                            "ml-auto",
-                                                            value === b.id ? "opacity-100" : "opacity-0"
-                                                        )}
-                                                    />
-                                                </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                    </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
                     </div>
                 </CardHeader>
 
-                <CardContent className={deckBakugansQuery.data?.bakugans && deckBakugansQuery.data?.bakugans.length > 0 ? "grid grid-cols-1 lg:grid-cols-3 gap-3" : "flex items-center justify-center"}>
+                <CardContent className={"grid grid-cols-1 lg:grid-cols-3 gap-3"}>
                     {
-                        deckBakugansQuery.data?.bakugans && deckBakugansQuery.data?.bakugans.length > 0 ? deckBakugansQuery.data?.bakugans.map((b, index) => <BakuganPreviewDeckEditor key={index} id={b.id} attribut={b.attribut} image={b.image} nom={b.nom} deckId={id} />)
-
-                            : <p className='text-center'>No Bakugan in the deck</p>
+                        bakugansInDeck.map((b, index) => <BakuganPreviewDeckEditor key={index} id={b.key} attribut={b.attribut} image={b.image} nom={b.name} deckId={deckId} />)
                     }
                 </CardContent>
 

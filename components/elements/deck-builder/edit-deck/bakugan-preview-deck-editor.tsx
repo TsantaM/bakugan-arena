@@ -20,13 +20,7 @@ export default function BakuganPreviewDeckEditor({ nom, image, attribut, id, dec
         mutationFn: RemoveBakuganFromDeck,
         onSuccess: () => {
             toast.success('Bakugan removed from deck successfully!')
-            queryClient.invalidateQueries({ queryKey: ['get-bakugans-in-deck'] })
-            queryClient.invalidateQueries({ queryKey: ['not-in-deck-bakugans'] })
-            queryClient.invalidateQueries({ queryKey: ['get-ability-cards-in-deck'] })
-            queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-ability-cards'] })
-            queryClient.invalidateQueries({ queryKey: ['count-bakugans-in-deck'] })
-            queryClient.invalidateQueries({ queryKey: ['get-exclusive-ability-cards-in-deck'] })
-            queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-exclusive-ability-cards'] })
+            queryClient.invalidateQueries({ queryKey: ['get-deck-data'] })
 
         },
         onError: (error) => {
