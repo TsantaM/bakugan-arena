@@ -21,6 +21,8 @@ import { useQuery } from "@tanstack/react-query"
 import Image from "next/image"
 import Link from "next/link"
 import { authClient } from "@/src/lib/auth-client"
+import { GetUserDecks } from "@/src/actions/deck-builder/get-deck-data"
+import { BakuganList } from "@/src/game-data/battle-brawlers/bakugans"
 
 
 export default function Lobby() {
@@ -28,18 +30,21 @@ export default function Lobby() {
     const [value, setValue] = useState('')
     const [open, setOpen] = useState(false)
     const user = authClient.useSession()
-    const id =  user.data ? user.data?.user.id : ''
+    const id = user.data ? user.data?.user.id : ''
 
-    // const getUserDecks = async () => {
-    //     return await GetUserDecks()
-    // }
+    const getUserDecks = async () => {
+        return await GetUserDecks()
+    }
 
-    // const getUserDecksQuery = useQuery({
-    //     queryKey: ['getUserDecks'],
-    //     queryFn: getUserDecks,
-    //     refetchOnWindowFocus: false,
-    //     refetchOnMount: false,
-    // })
+    const getUserDecksQuery = useQuery({
+        queryKey: ['getUserDecks'],
+        queryFn: getUserDecks,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+    })
+
+    const selectedDeckBakugans = getUserDecksQuery.data?.find((d) => d.id === value)?.bakugans
+    const selectedDeckBakugansData = BakuganList.filter((b) => selectedDeckBakugans?.includes(b.key))
 
     return (
         <>
@@ -51,7 +56,7 @@ export default function Lobby() {
                     </CardTitle>
                 </CardHeader>
 
-                {/* <CardContent className="flex flex-col gap-16">
+                <CardContent className="flex flex-col gap-16">
                     <Popover open={open} onOpenChange={setOpen}>
                         <PopoverTrigger asChild className="m-auto">
                             <Button
@@ -82,22 +87,13 @@ export default function Lobby() {
                                                     setOpen(false)
                                                 }}
                                             >
-                                                <Card className="w-full">
-                                                    <CardContent className="flex items-center gap-2">
-                                                        {
-                                                            d.bakugans.map((b, index) =>
-                                                                <Image key={index} alt={`${b.nom} ${b.attribut}`} src={`/images/bakugans/sphere/${b.image}/${b.attribut.toUpperCase()}.png`} width={45} height={45} />
-                                                            )
-                                                        }
-
-                                                        <Check
-                                                            className={cn(
-                                                                "ml-auto",
-                                                                value === d.id ? "opacity-100" : "opacity-0"
-                                                            )}
-                                                        />
-                                                    </CardContent>
-                                                </Card>
+                                                {d.name}
+                                                <Check
+                                                    className={cn(
+                                                        "ml-auto",
+                                                        value === d.id ? "opacity-100" : "opacity-0"
+                                                    )}
+                                                />
                                             </CommandItem>
                                         ))}
                                     </CommandGroup>
@@ -116,18 +112,18 @@ export default function Lobby() {
                             </CardHeader>
                             <CardContent className="flex justify-center items-center gap-5">
                                 {
-                                    getUserDecksQuery.data?.find((d) => d.id === value)?.bakugans.map((b, index) =>
-                                        <Image key={index} alt={`${b.nom} ${b.attribut}`} src={`/images/bakugans/sphere/${b.image}/${b.attribut.toUpperCase()}.png`} width={95} height={95} />
+                                    selectedDeckBakugansData.map((b, index) =>
+                                        <Image key={index} alt={`${b.name} ${b.attribut}`} src={`/images/bakugans/sphere/${b.image}/${b.attribut.toUpperCase()}.png`} width={95} height={95} />
                                     )
                                 }
                             </CardContent>
                         </Card>
                     }
 
-                </CardContent> */}
+                </CardContent>
 
                 <CardFooter className="flex">
-                    <Button disabled={!value || value === '' ? true : false } className="w-full text-xl font-bold" onClick={() => alert(`Deck Id : ${value}, user Id : ${id}`)}>{!value || value === '' ? 'Chose a deck' : 'Start Battle !' }</Button>
+                    <Button disabled={!value || value === '' ? true : false} className="w-full text-xl font-bold" onClick={() => alert(`Deck Id : ${value}, user Id : ${id}`)}>{!value || value === '' ? 'Chose a deck' : 'Start Battle !'}</Button>
                 </CardFooter>
             </Card>
 

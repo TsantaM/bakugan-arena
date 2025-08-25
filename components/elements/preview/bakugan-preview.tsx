@@ -1,17 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { GetBakugansDataType } from "@/src/actions/dex/get-bakugan-data";
+import { bakuganType } from "@/src/types/game-data-types";
 import Image from "next/image";
 
 
-export default function BakuganPreview({data} : {data: GetBakugansDataType}) {
+export default function BakuganPreview({data} : {data: bakuganType}) {
     return (
         <Card className="hover:bg-accent">
             <CardHeader>
                 <div className="size-20 m-auto relative">
-                    <Image src={`/images/bakugans/sphere/${data.image}/${data.attribut.toUpperCase()}.png`} alt={`${data.nom} ${data.attribut}`} fill/>
+                    <Image src={`/images/bakugans/sphere/${data.image}/${data.attribut.toUpperCase()}.png`} alt={`${data.name} ${data.attribut}`} fill/>
                 </div>
                 <CardTitle className="text-center">
-                    {`${data.nom} ${data.attribut}`}
+                    {`${data.name} ${data.attribut}`}
                 </CardTitle>
             </CardHeader>
             <CardContent>

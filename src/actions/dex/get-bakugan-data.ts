@@ -2,7 +2,6 @@
 
 import prisma from "@/src/lib/prisma"
 import { AttributType } from "@/src/types/attributs"
-import { TruckElectricIcon } from "lucide-react"
 
 export const GetBakugansData = async ({ nom, attribut }: { nom?: string, attribut?: AttributType }) => {
     return await prisma.bakugan.findMany({
