@@ -22,8 +22,8 @@ export default function CardPreviewDeckEditor({ id, deckId, nom, attribut, descr
         mutationFn: RemoveAbilityFromDeckFunction,
         onSuccess: () => {
             toast.success('Ability card removed from deck successfully!')
-            queryClient.invalidateQueries({ queryKey: ['get-ability-cards-in-deck'] })
-            queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-ability-cards'] })
+            queryClient.invalidateQueries({ queryKey: ['get-deck-data'] })
+
         },
     })
 
@@ -69,8 +69,7 @@ export function ExclusiveAbilityCardPreviewDeckEditor({ id, deckId, nom, descrip
         mutationFn: RemoveExclusiveAbilityFromDeckFunction,
         onSuccess: () => {
             toast.success('Exclusive ability card removed from deck successfully!')
-            queryClient.invalidateQueries({ queryKey: ['get-exclusive-ability-cards-in-deck'] })
-            queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-exclusive-ability-cards'] })
+            queryClient.invalidateQueries({ queryKey: ['get-deck-data'] })
         },
     })
 
@@ -109,8 +108,7 @@ export function GateCardPreviewDeckEditor({ id, deckId, nom, description }: { id
         mutationFn: RemoveGateCardFromDeckFunction,
         onSuccess: () => {
             toast.success('Gate card removed from deck successfully!')
-            queryClient.invalidateQueries({ queryKey: ['get-deck-gate-cards'] })
-            queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-gate-cards'] })
+            queryClient.invalidateQueries({ queryKey: ['get-deck-data'] })
         },
     })
 

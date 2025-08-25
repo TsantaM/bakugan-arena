@@ -17,7 +17,6 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { GetUserDecks } from "@/src/actions/deck-builder/get-deck-data"
 import { useQuery } from "@tanstack/react-query"
 import Image from "next/image"
 import Link from "next/link"
@@ -31,16 +30,16 @@ export default function Lobby() {
     const user = authClient.useSession()
     const id =  user.data ? user.data?.user.id : ''
 
-    const getUserDecks = async () => {
-        return await GetUserDecks()
-    }
+    // const getUserDecks = async () => {
+    //     return await GetUserDecks()
+    // }
 
-    const getUserDecksQuery = useQuery({
-        queryKey: ['getUserDecks'],
-        queryFn: getUserDecks,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-    })
+    // const getUserDecksQuery = useQuery({
+    //     queryKey: ['getUserDecks'],
+    //     queryFn: getUserDecks,
+    //     refetchOnWindowFocus: false,
+    //     refetchOnMount: false,
+    // })
 
     return (
         <>
@@ -52,7 +51,7 @@ export default function Lobby() {
                     </CardTitle>
                 </CardHeader>
 
-                <CardContent className="flex flex-col gap-16">
+                {/* <CardContent className="flex flex-col gap-16">
                     <Popover open={open} onOpenChange={setOpen}>
                         <PopoverTrigger asChild className="m-auto">
                             <Button
@@ -125,7 +124,7 @@ export default function Lobby() {
                         </Card>
                     }
 
-                </CardContent>
+                </CardContent> */}
 
                 <CardFooter className="flex">
                     <Button disabled={!value || value === '' ? true : false } className="w-full text-xl font-bold" onClick={() => alert(`Deck Id : ${value}, user Id : ${id}`)}>{!value || value === '' ? 'Chose a deck' : 'Start Battle !' }</Button>

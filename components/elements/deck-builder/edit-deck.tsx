@@ -29,8 +29,10 @@ export default function EditDeck({ id }: { id: string }) {
 
     const getDeckData = useQuery({
         queryKey: ['get-deck-data'],
-        queryFn: deckData
+        queryFn: deckData,
     })
+
+    console.log(getDeckData.data)
 
     const EditDeckNameForm = useForm({
         resolver: zodResolver(EditDeckNameSchema), defaultValues: {
@@ -105,13 +107,13 @@ export default function EditDeck({ id }: { id: string }) {
                         </CardContent>
                     </Card>
 
-                    <ManageBakugansInDeck id={id}/>
+                    <ManageBakugansInDeck deckId={id} bakugans={getDeckData.data?.bakugans}/> 
 
-                    <ManageAbilityCardsInDeck id={id}/>
+                    <ManageAbilityCardsInDeck deckId={id} abilityCards={getDeckData.data?.ability} bakugans={getDeckData.data?.bakugans ? getDeckData.data?.bakugans : []} countBakugans={getDeckData.data?.bakugans.length ? getDeckData.data?.bakugans.length : 0 }/>
 
-                    <ManageExclusiveAbilityCardsInDeck id={id}/>
+                    <ManageExclusiveAbilityCardsInDeck deckId={id} exclusiveAbilities={getDeckData.data?.exclusiveAbilities ? getDeckData.data?.exclusiveAbilities : []} bakugans={getDeckData.data?.bakugans ? getDeckData.data?.bakugans : []} countBakugans={getDeckData.data?.bakugans.length ? getDeckData.data?.bakugans.length : 0}/>
 
-                    <ManageGateCardsInDeckEditor id={id} />
+                    <ManageGateCardsInDeckEditor deckId={id} bakugans={getDeckData.data?.bakugans ? getDeckData.data?.bakugans : []} gateCards={getDeckData.data?.gateCards ? getDeckData.data?.gateCards : []}/>
 
                 </CardContent>
 

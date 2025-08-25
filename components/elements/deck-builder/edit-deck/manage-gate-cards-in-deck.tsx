@@ -1,10 +1,8 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { GetGateCardsInDeck } from "@/src/actions/deck-builder/get-deck-data"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { GateCardPreviewDeckEditor } from "./cards-preview-deck-editor"
-import { GetNotInDeckGateCards } from "@/src/actions/deck-builder/get-not-in-deck-data-action"
 import { useState } from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -22,36 +20,29 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { AddGateCardToDeck } from "@/src/actions/deck-builder/edit-deck-action"
 import { toast } from "sonner"
+import { AddGateCardToDeck } from "@/src/actions/deck-builder/edit-deck-action"
+import { GateCardList } from "@/src/game-data/battle-brawlers/gate-gards"
+import { BakuganList } from "@/src/game-data/battle-brawlers/bakugans"
 
-export default function ManageGateCardsInDeckEditor({ id }: { id: string }) {
+export default function ManageGateCardsInDeckEditor({ deckId, gateCards, bakugans }: { deckId: string, gateCards: string[], bakugans: string[] }) {
 
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState("")
     const queryClient = useQueryClient()
 
-    const deckGateCards = async () => {
-        return await GetGateCardsInDeck(id)
-    }
+    const deckCards = gateCards ? gateCards?.map((c) => GateCardList.find(card => card.key === c)) : []
 
-    const deckGateCardsQuery = useQuery({
-        queryKey: ['get-deck-gate-cards'],
-        queryFn: deckGateCards
+    const bakugansAttribut = BakuganList.filter((b) => bakugans.includes(b.key)).map((a) => a.attribut)
+    const cardInDeck = GateCardList.filter((c) => gateCards.includes(c.key))
+    const notInDeckCards = GateCardList.filter((c) => c.attribut ? bakugansAttribut.includes(c.attribut) : c).filter((c) => {
+        const exemplary = cardInDeck.filter((a) => c.key === a.key).length
+
+        return c.maxInDeck > exemplary
     })
 
-    const getNotInDeckGateCards = async () => {
-        return await GetNotInDeckGateCards({ id })
-    }
-
-    const getNotInDeckGateCardsQuery = useQuery({
-        queryKey: ['get-not-in-deck-gate-cards'],
-        queryFn: getNotInDeckGateCards
-    })
-
-
-    const addGateToDeck = async(cardId: string) => {
-        return await AddGateCardToDeck({cardId, deckId: id})
+    const addGateToDeck = async (cardId: string) => {
+        return await AddGateCardToDeck({ cardId, deckId })
     }
 
 
@@ -60,8 +51,8 @@ export default function ManageGateCardsInDeckEditor({ id }: { id: string }) {
         mutationFn: addGateToDeck,
         onSuccess: () => {
             toast.success('New get as been added successfuly')
-            queryClient.invalidateQueries({ queryKey: ['get-deck-gate-cards'] })
-            queryClient.invalidateQueries({ queryKey: ['get-not-in-deck-gate-cards'] })
+            queryClient.invalidateQueries({ queryKey: ['get-deck-data'] })
+            setValue('')
         }
     })
 
@@ -74,77 +65,81 @@ export default function ManageGateCardsInDeckEditor({ id }: { id: string }) {
                         <CardTitle>
                             Gate Cards
                         </CardTitle>
-                        <Popover open={open} onOpenChange={setOpen}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    role="combobox"
-                                    aria-expanded={open}
-                                    className="w-[200px] justify-between"
-                                    disabled={addGateToDeckMutation.isPending || deckGateCardsQuery.data?.length === 5 ? true : false}
-                                >
-                                    {getNotInDeckGateCardsQuery?.data && value ? (
-                                        (() => {
-                                            const selectedBakugan = getNotInDeckGateCardsQuery.data.find(
-                                                (b) => b.nom === value
-                                            )
+                        <div className="flex items-center gap-3">
+                            <p>{gateCards.length} / 5</p>
+                            <Popover open={open} onOpenChange={setOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        aria-expanded={open}
+                                        className="w-[200px] lg:w-[300px] justify-between"
+                                        disabled={addGateToDeckMutation.isPending || notInDeckCards.length === 5 ? true : false}
+                                    >
+                                        {value ? (
+                                            (() => {
+                                                const selectedCard = notInDeckCards.find(
+                                                    (b) => b.name === value
+                                                )
 
-                                            if (!selectedBakugan) return "Select Ability Cards..."
+                                                if (!selectedCard) return "Select gate Cards..."
 
-                                            const { nom } = selectedBakugan
+                                                const { name } = selectedCard
 
-                                            return (
-                                                <>
-                                                    {`${nom}`}
-                                                </>
-                                            )
-                                        })()
-                                    ) : (
-                                        "Select Ability Card..."
-                                    )}
-                                    <ChevronsUpDown className="opacity-50" />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[200px] p-0">
-                                <Command>
-                                    <CommandInput placeholder="Search Bakugan..." className="h-9" />
-                                    <CommandList>
-                                        <CommandEmpty>No card found.</CommandEmpty>
-                                        <CommandGroup>
-                                            {getNotInDeckGateCardsQuery?.data && getNotInDeckGateCardsQuery?.data.map((b, index) => (
-                                                <CommandItem
-                                                    key={index}
-                                                    value={b.nom}
-                                                    onSelect={(currentValue) => {
-                                                        setValue(currentValue === value ? "" : currentValue)
-                                                        setOpen(false)
-                                                        addGateToDeckMutation.mutate(b.id)
-                                                    }}
-                                                >
-                                                    {b.nom}
-                                                    <Check
-                                                        className={cn(
-                                                            "ml-auto",
-                                                            value === b.id ? "opacity-100" : "opacity-0"
-                                                        )}
-                                                    />
-                                                </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                    </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
+                                                return (
+                                                    <>
+                                                        {`${name}`}
+                                                    </>
+                                                )
+                                            })()
+                                        ) : (
+                                            "Select Gate Card..."
+                                        )}
+                                        <ChevronsUpDown className="opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[200px] lg:w-[300px] p-0">
+                                    <Command>
+                                        <CommandInput placeholder="Search Bakugan..." className="h-9" />
+                                        <CommandList>
+                                            <CommandEmpty>No card found.</CommandEmpty>
+                                            <CommandGroup>
+                                                {notInDeckCards.map((b, index) => (
+                                                    <CommandItem
+                                                        key={index}
+                                                        value={b.name}
+                                                        onSelect={(currentValue) => {
+                                                            setValue(currentValue === value ? "" : currentValue)
+                                                            setOpen(false)
+                                                            addGateToDeckMutation.mutate(b.key)
+                                                        }}
+                                                    >
+                                                        {b.name}
+                                                        <Check
+                                                            className={cn(
+                                                                "ml-auto",
+                                                                value === b.key ? "opacity-100" : "opacity-0"
+                                                            )}
+                                                        />
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+
                     </div>
 
                 </CardHeader>
 
 
-                <CardContent className={ deckGateCardsQuery.data && deckGateCardsQuery.data.length > 0 ? "grid grid-cols-1 md:grid-cols-2 gap-3" : ""}>
+                <CardContent className={deckCards && deckCards.length > 0 ? "grid grid-cols-1 md:grid-cols-2 gap-3" : ""}>
                     {
-                        deckGateCardsQuery.data && deckGateCardsQuery.data?.length > 0 ? deckGateCardsQuery.data.map((b, index) => <GateCardPreviewDeckEditor key={index} id={b.id} nom={b.gateCards.nom} deckId={id} description={b.gateCards.description} />)
+                        deckCards && deckCards.length > 0 ? deckCards.map((b, index) => <GateCardPreviewDeckEditor key={index} id={b ? b.key : ''} nom={b ? b.name : ''} deckId={deckId} description={b ? b.description : ''} />)
 
-                            : <p className='text-center'>No Bakugan in the deck</p>
+                            : <p className='text-center'>No Gate Card in the deck</p>
                     }
                 </CardContent>
             </Card>

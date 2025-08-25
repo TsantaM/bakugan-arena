@@ -5,18 +5,18 @@ import Section from "@/components/ui/section";
 import CreateDeckButton from "./create-deck-button";
 import DeckPreview from "./deck-preview";
 import { useQuery } from "@tanstack/react-query";
-import { GetUserDecks } from "@/src/actions/deck-builder/get-deck-data";
+// import { GetUserDecks } from "@/src/actions/deck-builder/get-deck-data";
 
 export default function DeckBuilerLanding() {
 
-    const GetUsersDecks = async () => {
-        return await GetUserDecks()
-    }
+    // const GetUsersDecks = async () => {
+    //     return await GetUserDecks()
+    // }
 
-    const GetUsersDecksQuery = useQuery({
-        queryKey: ['get-users-deck'],
-        queryFn: GetUsersDecks
-    })
+    // const GetUsersDecksQuery = useQuery({
+    //     queryKey: ['get-users-deck'],
+    //     queryFn: GetUsersDecks
+    // })
 
     return (
         <>
@@ -29,11 +29,11 @@ export default function DeckBuilerLanding() {
                             <CreateDeckButton />
                         </div>
                     </CardHeader>
-                    <CardContent className={GetUsersDecksQuery.data ? 'grid grid-cols-1 lg:grid-cols-3 gap-3' : ''}>
+                    {/* <CardContent className={GetUsersDecksQuery.data ? 'grid grid-cols-1 lg:grid-cols-3 gap-3' : ''}>
                         {
                             GetUsersDecksQuery.data ? GetUsersDecksQuery.data.map((d, index) => <DeckPreview key={index} data={d} />) : <p>{`You d'ont have deck create one`}</p>
                         }
-                    </CardContent>
+                    </CardContent> */}
                 </Card>
             </Section>
 
