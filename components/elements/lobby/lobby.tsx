@@ -23,6 +23,7 @@ import Link from "next/link"
 import { authClient } from "@/src/lib/auth-client"
 import { GetUserDecks } from "@/src/actions/deck-builder/get-deck-data"
 import { BakuganList } from "@/src/game-data/battle-brawlers/bakugans"
+import UseSearchOpponent from "@/src/sockets/search-opponent"
 
 
 export default function Lobby() {
@@ -32,6 +33,10 @@ export default function Lobby() {
     const [open, setOpen] = useState(false)
     const user = authClient.useSession()
     const id = user.data ? user.data?.user.id : ''
+    const data = {
+        userId: id,
+        deckId: value
+    }
 
     const getUserDecks = async () => {
         return await GetUserDecks()
@@ -124,7 +129,7 @@ export default function Lobby() {
                 </CardContent>
 
                 <CardFooter className="flex">
-                    <Button disabled={!value || value === '' ? true : false} className="w-full text-xl font-bold" onClick={() => alert(`Deck Id : ${value}, user Id : ${id}`)}>{!value || value === '' ? 'Chose a deck' : 'Start Battle !'}</Button>
+                    <Button disabled={!value || value === '' ? true : false} className="w-full text-xl font-bold" onClick={() => emitPlayerData(data)}>{waitingOpponent ? 'Waiting opponent ...' : !value || value === '' ? 'Chose a deck' : 'Start Battle !'}</Button>
                 </CardFooter>
             </Card>
 

@@ -16,7 +16,7 @@ export default function UseSearchOpponent() {
 
     const emitPlayerData = (data: PlayerData) => {
         const {deckId, userId} = data
-        if(socket && !waitingOpponent) {
+        if(socket && !waitingOpponent && data.deckId != '') {
         socket?.emit('search-opponent', ({userId, deckId}))
         setWaitingOpponent(true)
     }
