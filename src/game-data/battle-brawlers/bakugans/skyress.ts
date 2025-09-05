@@ -5,7 +5,7 @@ export const SkyressVentus: bakuganType = {
     attribut: 'Ventus',
     image: 'skyress',
     key: 'skyress-ventus',
-    powerLevel: 300,
+    powerLevel: 370,
     family: 'Skyress',
     exclusiveAbilities: ['vent-violent-de-noblesse-verte']
 }
@@ -15,7 +15,7 @@ export const SkyressStormVentus: bakuganType = {
     attribut: 'Ventus',
     image: 'skyress-storm',
     key: 'skyress-storm-ventus',
-    powerLevel: 325,
+    powerLevel: 450,
     family: 'Skyress',
     exclusiveAbilities: []
 }

@@ -5,7 +5,7 @@ export const PreyasAquos: bakuganType = {
     name: 'Preyas',
     attribut: 'Aquos',
     image: 'preyas',
-    powerLevel: 320,
+    powerLevel: 300,
     family: 'Preyas',
     exclusiveAbilities: ['ombre-bleue']
 }
@@ -16,7 +16,7 @@ export const DiabloAquos: bakuganType = {
     name: 'Diablo',
     attribut: 'Aquos',
     image: 'diablo',
-    powerLevel: 320,
+    powerLevel: 400,
     family: 'Diablo',
     exclusiveAbilities: []
 }
@@ -26,7 +26,7 @@ export const AngeloAquos: bakuganType = {
     name: 'Angelo',
     attribut: 'Aquos',
     image: 'angelo',
-    powerLevel: 320,
+    powerLevel: 400,
     family: 'Angelo',
     exclusiveAbilities: []
 }

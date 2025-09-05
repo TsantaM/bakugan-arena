@@ -5,7 +5,7 @@ export const HydranoidDarkus: bakuganType = {
     name: 'Hydranoid',
     attribut: 'Darkus',
     image: 'hydranoid',
-    powerLevel: 300,
+    powerLevel: 340,
     family: 'Hydranoid',
     exclusiveAbilities: ['chambre-de-gravité']
 }
@@ -15,7 +15,7 @@ export const DeltaHydranoidDarkus: bakuganType = {
     name: 'Hydranoid Delta',
     attribut: 'Darkus',
     image: 'hydranoid-delta',
-    powerLevel: 320,
+    powerLevel: 450,
     family: 'Hydranoid',
     exclusiveAbilities: []
 }
@@ -25,7 +25,7 @@ export const AlphaHydranoidDarkus: bakuganType = {
     name: 'Hydranoid Alpha',
     attribut: 'Darkus',
     image: 'hydranoid-alpha',
-    powerLevel: 320,
+    powerLevel: 500,
     family: 'Hydranoid',
     exclusiveAbilities: []
 }

@@ -18,7 +18,7 @@ export default function BakuDexExclusiveAbilityCards() {
 
             <CardHeader>
                 <CardTitle>
-                    Ability Cards
+                    Ability Cards ({filtered.length})
                 </CardTitle>
                 <div>
                     <Input placeholder="Ability Card Name" onChange={(e) => setSearch(e.target.value)} />

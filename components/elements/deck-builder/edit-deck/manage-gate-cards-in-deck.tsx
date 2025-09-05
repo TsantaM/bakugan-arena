@@ -74,7 +74,7 @@ export default function ManageGateCardsInDeckEditor({ deckId, gateCards, bakugan
                                         role="combobox"
                                         aria-expanded={open}
                                         className="w-[200px] lg:w-[300px] justify-between"
-                                        disabled={addGateToDeckMutation.isPending || notInDeckCards.length === 5 ? true : false}
+                                        disabled={addGateToDeckMutation.isPending || gateCards.length === 5 ? true : false}
                                     >
                                         {value ? (
                                             (() => {

@@ -5,7 +5,7 @@ export const GoremSubterra: bakuganType = {
     name: 'Gorem',
     attribut: 'Subterra',
     image: 'gorem',
-    powerLevel: 320,
+    powerLevel: 380,
     family: 'Gorem',
     exclusiveAbilities: ['impact-majeur']
 }
@@ -14,8 +14,8 @@ export const HammerGoremSubterra: bakuganType = {
     key: 'hammer-gorem-subterra',
     name: 'Hammer Gorem',
     attribut: 'Subterra',
-    image: 'gorem',
-    powerLevel: 350,
+    image: 'gorem-hammer',
+    powerLevel: 450,
     family: 'Gorem',
     exclusiveAbilities: ['impact-majeur']
 }

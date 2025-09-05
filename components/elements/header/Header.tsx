@@ -49,12 +49,12 @@ export default async function Header() {
                         <Suspense fallback={<Skeleton />}>
                             <DropdownMenu>
                                 <DropdownMenuTrigger>
-                                    <Button variant='outline' asChild className="p-0">
+                                    <Button variant='outline' asChild>
                                         <Avatar>
                                             {
-                                                user.image != undefined && <AvatarImage src={user.image} className="size-5" alt={user.name} />
+                                                user.image != undefined ? <AvatarImage asChild src={user.image} alt={user.name}/> : <AvatarFallback>{user.name[0].toUpperCase()}</AvatarFallback>
                                             }
-                                            <AvatarFallback>{user.name[0].toUpperCase()}</AvatarFallback>
+                                            
                                         </Avatar>
                                     </Button>
                                 </DropdownMenuTrigger>

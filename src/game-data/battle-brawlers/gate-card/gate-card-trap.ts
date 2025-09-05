@@ -13,3 +13,10 @@ export const Echange: gateCardType = {
     maxInDeck: 1,
     description: `Tout Bakugan ayant un niveau de puissance supérieur à 450 G perd automatiquement`
 }
+
+export const SuperPyrus: gateCardType = {
+    key: 'super-pyrus',
+    name: 'Super Pyrus',
+    maxInDeck: 1,
+    description: `Echange les niveau de puissance des bakugans au combat. Si elle n'est pas activée par le propriétaire, elle s'active automatiquement à la fin du combat.`
+}

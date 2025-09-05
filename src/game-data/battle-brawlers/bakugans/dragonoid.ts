@@ -3,7 +3,7 @@ import { bakuganType } from "@/src/types/game-data-types"
 export const DragonoidPyrus: bakuganType = {
     name: 'Dragonoid',
     attribut: 'Pyrus',
-    powerLevel: 300,
+    powerLevel: 340,
     image: 'dragonoid',
     key: 'dragonoid-pyrus',
     family: 'Dragonoid',
@@ -13,7 +13,7 @@ export const DragonoidPyrus: bakuganType = {
 export const DragonoidDeltaPyrus: bakuganType = {
     name: 'Dragonoid Delta',
     attribut: "Pyrus",
-    powerLevel: 325,
+    powerLevel: 450,
     image: 'dragonoid-delta',
     key: 'dragonoid-delta-pyrus',
     family: 'Dragonoid',
@@ -23,7 +23,7 @@ export const DragonoidDeltaPyrus: bakuganType = {
 export const UltimateDragonoid: bakuganType = {
     name: 'Ultimate Dragonoid',
     attribut: 'Pyrus',
-    powerLevel: 450,
+    powerLevel: 500,
     image: 'dragonoid-ultimate',
     key: 'ultimate-dragonoid-pyrus',
     family: 'Dragonoid',

@@ -98,3 +98,12 @@ model Deck {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 }
+
+model Rooms {
+  id        String   @id @default(uuid())
+  player1Id String
+  p1Deck    String
+  player2Id String
+  p2Deck    String
+  createdAt DateTime @default(now())
+}

@@ -16,7 +16,7 @@ export default function BakuDex() {
             <Card>
                 <CardHeader>
                     <CardTitle>
-                        Bakugans
+                        Bakugans ({filtered.length})
                     </CardTitle>
                     <div>
                         <Input placeholder="Bakugan Name" onChange={(e) => setSearch(e.target.value)} />

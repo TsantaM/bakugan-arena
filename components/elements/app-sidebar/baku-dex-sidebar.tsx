@@ -38,6 +38,11 @@ const LinksDashboard: LinksDashboardType[] = [
         icone: <SwatchBook />,
         label: 'Exclusives Ability Cards',
         href: '/baku-dex/exclusive-ability-cards'
+    },
+    {
+        icone: <SwatchBook />,
+        label: 'Gate Cards',
+        href: '/baku-dex/gate-cards'
     }
 ]
 
@@ -61,7 +66,7 @@ export default function BakuDexSidebar({ user }: { user: UserType | undefined })
                                 <SidebarMenuItem>
                                     <SidebarMenuButton asChild>
                                         <Link href='/dashboard'>
-                                            <Home/>
+                                            <Home />
                                             <span>Dashboard</span>
                                         </Link>
                                     </SidebarMenuButton>
